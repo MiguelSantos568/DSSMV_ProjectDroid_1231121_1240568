@@ -1,0 +1,96 @@
+@startuml
+
+'----- Classes -----
+
+class "Condominium"{
+    - id: long
+    - name: String
+    - buildings: Building
+}
+
+class "Coordinates"{
+    - latitude: double
+    - longitude: double
+}
+
+class "Amenity"{
+    - id: long
+    - name: String
+    - description: String
+    - type: String
+    - buildingId: long
+    - requiresBooking: boolean
+    - capacity: int
+    - openingTime: LocalTime
+    - closingTime: LocalTime
+    - bookingFee: int
+    - isActive: boolean
+    - rules: String
+}
+
+class "Booking"{
+    - id: long
+    - amenityId: long
+    - residentId: long
+    - startTime: String
+    - endTime: String
+    - status: String
+    - numberOfGuests: int
+    - fee: int
+    - notes: String
+}
+
+class "Building"{
+    - id: long
+    - name: String
+    - condominiumId: long
+}
+
+class "Resident"{
+    - id: long
+    - firstName: String
+    - lastName: String
+    - email: String
+    - phone: String
+    - documentNumber: String
+    - unitId: long
+    - residentType: String
+    - moveInDate: String
+    - moveOutDate: String
+    - isActive: boolean
+}
+
+class "Unit"{
+    - id: long
+    - unitNumber: String
+    - buildingId: long
+    - floor: int
+    - type: String
+    - area: int
+    - bedrooms: int
+    - bathrooms: int
+    - status: String
+    - monthlyFee: int
+    - permillage: int
+}
+
+class "LocalTime"{
+    - hour: int
+    - minute: int
+    - second: int
+    - nano: int
+}
+
+'----- Connections -----
+
+"Coordinates" -right. "Condominium"
+"LocalTime" -. "Booking"
+
+"Building" "1..*"--"1" "Condominium" : "contains"
+"Amenity" "1..*"--"1" "Building" : "contains"
+"Unit" "1..*"-left-"1" "Building" : "contains"
+"Resident" "1..*"--"1" "Unit" : "is inhabited"
+"Booking" "1..*"-right-"1" "Resident" : "books"
+"Booking" "1..*"-left-"1" "Amenity" : "provides\nlocation"
+
+@enduml
