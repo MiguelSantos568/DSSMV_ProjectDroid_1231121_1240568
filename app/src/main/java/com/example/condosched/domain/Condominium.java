@@ -47,4 +47,10 @@ public class Condominium {
     public void setCoordinates(Coordinates coordinates) {
         this.coordinates = coordinates;
     }
+
+    public void addCoordinatesToName() {
+        Coordinates coordinates = this.getCoordinates();
+        String notatedCoord = coordinates.toNotatedText(coordinates);
+        this.name =  this.name + ";" + notatedCoord;
+    }
 }

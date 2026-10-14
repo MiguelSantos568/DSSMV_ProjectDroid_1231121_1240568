@@ -9,10 +9,29 @@ public class LocalTime {
     public LocalTime() {}
 
     public LocalTime(int hour, int minute, int second, int nano) {
-        this.hour = hour;
-        this.minute = minute;
-        this.second = second;
-        this.nano = nano;
+        if(hour < 0 || hour > 23) {
+            throw new IllegalArgumentException("Hour must be between 0 and 23");
+        }else{
+            this.hour = hour;
+        }
+
+        if(minute < 0 || minute > 59) {
+            throw new IllegalArgumentException("Minute must be between 0 and 59");
+        }else{
+            this.minute = minute;
+        }
+
+        if(second < 0 || second > 59) {
+            throw new IllegalArgumentException("Second must be between 0 and 59");
+        } else{
+            this.second = second;
+        }
+
+        if(nano < 0 || nano > 1_000_000_000) {
+            throw new IllegalArgumentException("Nano must be between 0 and 1,000,000,000");
+        } else {
+            this.nano = nano;
+        }
     }
 
     public int getHour() {

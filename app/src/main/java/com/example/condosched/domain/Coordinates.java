@@ -40,7 +40,10 @@ public class Coordinates {
         double deltaLatitude = this.latitude - coordinates.latitude;
         double deltaLongitude = this.longitude - coordinates.longitude;
 
-        return Math.sqrt(Math.pow(deltaLatitude, (double) 2) + Math.pow(deltaLongitude, (double) 2));
+        return Math.sqrt(Math.pow(deltaLatitude, 2) + Math.pow(deltaLongitude, 2));
     }
 
+    public String toNotatedText(Coordinates coordinates){
+        return "lat:" + coordinates.latitude + ";lon:" + coordinates.longitude;
+    }
 }

@@ -13,7 +13,8 @@ public class Booking {
 
     public Booking() {}
 
-    public Booking(long id, long amenityId, long residentId, String startTime, String endTime, String status, int numberOfGuests, int fee, String notes) {
+    public Booking(long id, long amenityId, long residentId, String startTime, String endTime, String status,
+                   int numberOfGuests, int fee, String notes) {
         this.id = id;
         this.amenityId = amenityId;
         this.residentId = residentId;
