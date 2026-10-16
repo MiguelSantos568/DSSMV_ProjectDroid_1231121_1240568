@@ -41,3 +41,6 @@ A aplicação destina-se a ser utilizada por um administrador de condomínios co
 Como certas amenidades estão expostas ao meio ambiente, a informação dos eventos é complementada com a informação do estado de tempo: WeatherAPI.
 O utilizador pode usar a câmara do telemóvel para adicionar fotografias das amenidades e dos bookings.
 
+---
+
+Login (resident) 
