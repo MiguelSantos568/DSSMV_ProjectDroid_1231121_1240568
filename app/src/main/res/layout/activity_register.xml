@@ -1,41 +1,110 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+
+<ScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="32dp">
+        android:fillViewport="true">
 
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Criar Conta"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            android:layout_gravity="center"
-            android:layout_marginBottom="40dp"/>
-
-    <EditText
-            android:id="@+id/emailInput"
+    <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Email"
-            android:inputType="textEmailAddress"/>
+            android:orientation="vertical"
+            android:padding="24dp">
 
-    <EditText
-            android:id="@+id/passwordInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:layout_marginTop="16dp"/>
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Criar conta"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="24dp"/>
 
-    <Button
-            android:id="@+id/registerButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Registar"
-            android:layout_marginTop="24dp"/>
+        <EditText
+                android:id="@+id/nameInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Nome completo"
+                android:inputType="textPersonName"/>
 
-</LinearLayout>
+        <EditText
+                android:id="@+id/emailInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Email"
+                android:inputType="textEmailAddress"/>
+
+        <EditText
+                android:id="@+id/passwordInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Password"
+                android:inputType="textPassword"/>
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="A tua habitação"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="12dp"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Condomínio"/>
+
+        <Spinner
+                android:id="@+id/condominiumSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"/>
+
+        <TextView
+                android:id="@+id/buildingLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Prédio"
+                android:layout_marginTop="12dp"
+                android:visibility="gone"/>
+
+        <Spinner
+                android:id="@+id/buildingSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:visibility="gone"/>
+
+        <TextView
+                android:id="@+id/floorLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Andar"
+                android:layout_marginTop="12dp"
+                android:visibility="gone"/>
+        <Spinner
+                android:id="@+id/floorSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:visibility="gone"/>
+
+        <TextView
+                android:id="@+id/unitLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Número da porta"
+                android:layout_marginTop="12dp"
+                android:visibility="gone"/>
+        <Spinner
+                android:id="@+id/unitSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:visibility="gone"/>
+
+        <Button
+                android:id="@+id/registerButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Criar conta"
+                android:layout_marginTop="24dp"/>
+
+    </LinearLayout>
+</ScrollView>

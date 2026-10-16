@@ -1,15 +1,20 @@
+
 package com.example.condosched.domain;
 
+import java.util.List;
+
 public class Condominium {
+
     private long id;
     private String name;
     private Building buildings;
-
+    private List<Building> buildingsList;
     private Coordinates coordinates;
 
     public Condominium() {}
 
-    public Condominium(long id, String name, Building buildings, double latitude, double longitude) {
+    public Condominium(long id, String name, Building buildings,
+                       double latitude, double longitude) {
         this.id = id;
         this.name = name;
         this.buildings = buildings;
@@ -40,6 +45,14 @@ public class Condominium {
         this.buildings = buildings;
     }
 
+    public List<Building> getBuildingsList() {
+        return buildingsList;
+    }
+
+    public void setBuildingsList(List<Building> buildingsList) {
+        this.buildingsList = buildingsList;
+    }
+
     public Coordinates getCoordinates() {
         return coordinates;
     }
@@ -51,6 +64,6 @@ public class Condominium {
     public void addCoordinatesToName() {
         Coordinates coordinates = this.getCoordinates();
         String notatedCoord = coordinates.toNotatedText(coordinates);
-        this.name =  this.name + ";" + notatedCoord;
+        this.name = this.name + ";" + notatedCoord;
     }
 }
