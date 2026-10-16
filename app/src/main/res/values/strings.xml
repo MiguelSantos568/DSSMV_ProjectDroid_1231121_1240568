@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">CondoSched</string>
+    <string name="Hello_World">Hello World!</string>
+    <string name="settings">Settings</string>
+    <string name="language">Language</string>
+    <string name="credits">Credits</string>
+    <string name="namedCredits">* ISEP 2026 *\nDSSMV\n\nGustavo Abrantes\n1231121\n\nMiguel Santos\n1240568</string>
+    <string name="condominium">Condominium</string>
+    <string name="amenities">Amenities</string>
 </resources>

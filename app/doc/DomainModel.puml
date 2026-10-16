@@ -2,6 +2,22 @@
 
 '----- Classes -----
 
+class "Document"{
+    - id: long
+    - title: String
+    - description: String
+    - documentType: String
+    - fileName: String
+    - filePath: String
+    - mimeType: String
+    - fileSize: long
+    - unitId: long
+    - maintenanceRequestId: long
+    - maintenanceInterventionId: long
+    - isPublic: boolean
+    - publishedDate: String
+}
+
 class "Condominium"{
     - id: long
     - name: String
@@ -102,5 +118,8 @@ class "Event"{
 "Booking" "1..*"-left-"1" "Amenity" : "provides\nlocation"
 
 "Booking" -up-|> "Event" : "expands"
+
+"Amenity" -left.> "Document" : photo
+"Event" -left.> "Document" : photo
 
 @enduml
