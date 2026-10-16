@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">CondoSched</string>
+    <string name="Hello_World">Olá Mundo!</string>
+    <string name="settings">Definições</string>
+    <string name="language">Língua</string>
+    <string name="credits">Créditos</string>
+    <string name="namedCredits">* ISEP 2026 *\nDSSMV\n\nGustavo Abrantes\n1231121\n\nMiguel Santos\n1240568</string>
+    <string name="condominium">Condomínio</string>
+    <string name="amenities">Comodidades</string>
+</resources>
