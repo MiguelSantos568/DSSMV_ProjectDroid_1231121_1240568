@@ -34,5 +34,8 @@
         <activity
                 android:name=".MainActivity"
                 android:exported="false" />
+        <activity android:name=".ui.CreditsActivity"/>
+        <activity android:name=".ui.CondominiumActivity"/>
+        <activity android:name=".ui.AmenitiesActivity"/>
     </application>
 </manifest>
