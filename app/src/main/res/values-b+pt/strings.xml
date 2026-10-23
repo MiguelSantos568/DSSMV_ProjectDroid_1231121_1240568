@@ -3,6 +3,7 @@
     <string name="Hello_World">Olá Mundo!</string>
 
     <string name="amenities">Comodidades</string>
+    <string name="camera">Câmara</string>
     <string name="condominium">Condomínio</string>
     <string name="credits">Créditos</string>
     <string name="firstname">Nome</string>
@@ -10,5 +11,7 @@
     <string name="lastname">Apelido</string>
     <string name="namedCredits">* ISEP 2026 *\nDSSMV\n\nGustavo Abrantes\n1231121\n\nMiguel Santos\n1240568</string>
     <string name="password">Palavra-Passe</string>
+    <string name="save">Guardar</string>
     <string name="settings">Definições</string>
+    <string name="skip">Saltar</string>
 </resources>

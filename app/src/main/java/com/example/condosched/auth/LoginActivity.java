@@ -14,7 +14,7 @@ import com.example.condosched.network.AuthService;
 public class LoginActivity extends Activity {
 
     private EditText emailInput, passwordInput;
-    private Button loginButton, goToRegisterButton;
+    private Button loginButton, goToRegisterButton, skipButton;
     private AuthService authService = new AuthService();
 
     @Override
@@ -26,6 +26,12 @@ public class LoginActivity extends Activity {
         passwordInput = findViewById(R.id.passwordInput);
         loginButton = findViewById(R.id.loginButton);
         goToRegisterButton = findViewById(R.id.goToRegisterButton);
+        skipButton = findViewById(R.id.skipLoginButton);
+
+        skipButton.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+        });
 
         loginButton.setOnClickListener(v -> login());
 

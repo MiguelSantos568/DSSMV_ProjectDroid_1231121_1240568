@@ -11,6 +11,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import android.widget.Button;
+import com.example.condosched.ui.CameraActivity;
 import com.example.condosched.ui.CondominiumActivity;
 import com.example.condosched.ui.CreditsActivity;
 
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.d("BUTTONS", "User tapped Hello World button");
-                Intent intent = new Intent(MainActivity.this, CondominiumActivity.class);
+                Intent intent = new Intent(MainActivity.this, CameraActivity.class);
                 startActivity(intent);
             }
         });
