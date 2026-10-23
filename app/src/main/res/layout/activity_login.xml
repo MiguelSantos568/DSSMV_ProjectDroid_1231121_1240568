@@ -44,4 +44,11 @@
             android:text="Criar conta"
             android:layout_marginTop="12dp"/>
 
+    <Button
+            android:id="@+id/skipLoginButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/skip"
+            android:layout_marginTop="36dp"/>
+
 </LinearLayout>
