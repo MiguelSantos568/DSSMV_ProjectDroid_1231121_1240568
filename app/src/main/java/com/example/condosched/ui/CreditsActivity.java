@@ -1,6 +1,7 @@
 package com.example.condosched.ui;
 
 import android.os.Bundle;
+import android.util.Log;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.condosched.R;
@@ -12,5 +13,6 @@ public class CreditsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.credits);
+        Log.d("CreditsActivity", "Credits opened");
     }
 }
