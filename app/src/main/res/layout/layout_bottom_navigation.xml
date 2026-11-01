@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="76dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingTop="8dp"
+        android:paddingBottom="6dp"
+        android:background="#FFFFFF"
+        android:elevation="10dp">
+
+    <!-- INÍCIO -->
+    <LinearLayout
+            android:id="@+id/navHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+        <ImageView
+                android:layout_width="23dp"
+                android:layout_height="23dp"
+                android:src="@android:drawable/ic_menu_view"
+                android:contentDescription="Início"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Início"
+                android:textSize="11sp"/>
+    </LinearLayout>
+
+    <!-- RESERVAS -->
+    <LinearLayout
+            android:id="@+id/navBookings"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+        <ImageView
+                android:layout_width="23dp"
+                android:layout_height="23dp"
+                android:src="@android:drawable/ic_menu_today"
+                android:contentDescription="Reservas"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Reservas"
+                android:textSize="11sp"/>
+    </LinearLayout>
+
+    <!-- CONDOMÍNIO -->
+    <LinearLayout
+            android:id="@+id/navCondo"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+        <ImageView
+                android:layout_width="23dp"
+                android:layout_height="23dp"
+                android:src="@android:drawable/ic_menu_compass"
+                android:contentDescription="Condomínio"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Condomínio"
+                android:textSize="11sp"/>
+    </LinearLayout>
+
+    <!-- PERFIL -->
+    <LinearLayout
+            android:id="@+id/navProfile"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+        <ImageView
+                android:layout_width="23dp"
+                android:layout_height="23dp"
+                android:src="@android:drawable/ic_menu_myplaces"
+                android:contentDescription="Perfil"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Perfil"
+                android:textSize="11sp"/>
+    </LinearLayout>
+
+</LinearLayout>

@@ -6,14 +6,16 @@ public class UnitDTO {
     private long buildingId;
     private int floor;
     private String type;
-    private int area;
+    private double area;
     private int bedrooms;
     private int bathrooms;
     private String status;
-    private int monthlyFee;
-    private int permillage;
+    private double monthlyFee;
+    private double permillage;
 
-    public UnitDTO(long id, String unitNumber, long buildingId, int floor, String type, int area, int bedrooms, int bathrooms, String status, int monthlyFee, int permillage) {
+    public UnitDTO() {}
+
+    public UnitDTO(long id, String unitNumber, long buildingId, int floor, String type, double area, int bedrooms, int bathrooms, String status, double monthlyFee, double permillage) {
         this.id = id;
         this.unitNumber = unitNumber;
         this.buildingId = buildingId;
@@ -67,11 +69,11 @@ public class UnitDTO {
         this.type = type;
     }
 
-    public int getArea() {
+    public double getArea() {
         return area;
     }
 
-    public void setArea(int area) {
+    public void setArea(double area) {
         this.area = area;
     }
 
@@ -99,19 +101,19 @@ public class UnitDTO {
         this.status = status;
     }
 
-    public int getMonthlyFee() {
+    public double getMonthlyFee() {
         return monthlyFee;
     }
 
-    public void setMonthlyFee(int monthlyFee) {
+    public void setMonthlyFee(double monthlyFee) {
         this.monthlyFee = monthlyFee;
     }
 
-    public int getPermillage() {
+    public double getPermillage() {
         return permillage;
     }
 
-    public void setPermillage(int permillage) {
+    public void setPermillage(double permillage) {
         this.permillage = permillage;
     }
 }

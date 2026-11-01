@@ -1,54 +1,13 @@
-<LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="32dp">
-
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="CondoSched"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            android:layout_gravity="center"
-            android:layout_marginBottom="40dp"/>
-
-    <EditText
-            android:id="@+id/emailInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Email"
-            android:inputType="textEmailAddress"/>
-
-    <EditText
-            android:id="@+id/passwordInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:layout_marginTop="16dp"/>
-
-    <Button
-            android:id="@+id/loginButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Entrar"
-            android:layout_marginTop="24dp"/>
-
-    <Button
-            android:id="@+id/goToRegisterButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Criar conta"
-            android:layout_marginTop="12dp"/>
-
-    <Button
-            android:id="@+id/skipLoginButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/skip"
-            android:layout_marginTop="36dp"/>
-
+﻿<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:gravity="center" android:padding="32dp"
+    android:background="#F5F7FB">
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="CondoSched" android:textSize="30sp" android:textStyle="bold" android:textColor="#1D3557" />
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="@string/qr_welcome" android:gravity="center" android:layout_marginTop="24dp" android:textSize="18sp" />
+    <Button android:id="@+id/scanQrButton" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="@string/qr_scan" android:layout_marginTop="32dp" />
+    <TextView android:id="@+id/qrStatus" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="@string/qr_ready" android:gravity="center" android:accessibilityLiveRegion="polite" android:layout_marginTop="20dp" />
 </LinearLayout>

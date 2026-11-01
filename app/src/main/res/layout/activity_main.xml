@@ -1,41 +1,238 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#F7F8F6"
         tools:context=".MainActivity">
 
+    <!-- CABEÇALHO -->
+    <LinearLayout
+            android:id="@+id/homeHeader"
+            android:layout_width="0dp"
+            android:layout_height="76dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
+        <ImageButton
+                android:id="@+id/homeMenuButton"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:src="@android:drawable/ic_menu_sort_by_size"
+                android:background="@android:color/transparent"
+                android:contentDescription="Abrir menu" app:tint="#243A48"/>
 
-    <Button
-            android:id="@+id/button1"
+        <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="condosched."
+                android:textSize="23sp"
+                android:textStyle="bold"
+                android:textColor="#183747"/>
+
+        <ImageView
+                android:id="@+id/homeProfileImage"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:padding="10dp"
+                android:src="@android:drawable/ic_menu_myplaces"
+                android:background="@drawable/bg_avatar"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Abrir perfil" app:tint="#264E69"/>
+    </LinearLayout>
+
+    <!-- CONTEÚDO -->
+    <ScrollView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            android:clipToPadding="false"
+            app:layout_constraintTop_toBottomOf="@id/homeHeader"
+            app:layout_constraintBottom_toTopOf="@id/homeBottomNavigation"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="22dp"
+                android:paddingEnd="22dp"
+                android:paddingTop="22dp"
+                android:paddingBottom="28dp">
+
+            <!-- BOAS-VINDAS -->
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="O teu espaço, num só lugar."
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    android:textColor="#203746"/>
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Tudo o que precisas para o dia a dia no condomínio."
+                    android:textSize="14sp"
+                    android:textColor="#7C8B91"/>
+
+            <!-- CARTÃO PRINCIPAL -->
+            <LinearLayout
+                    android:id="@+id/homeCondoCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp"
+                    android:layout_marginTop="28dp"
+                    android:orientation="vertical"
+                    android:gravity="bottom"
+                    android:padding="24dp"
+                    android:background="@drawable/bg_home_hero">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="A MINHA CASA"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.14"
+                        android:textColor="#B8D0D8"/>
+
+                <TextView
+                        android:id="@+id/homeCondoName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="O meu condomínio"
+                        android:textSize="27sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"/>
+
+                <TextView
+                        android:id="@+id/homeUnitInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="As informações da tua habitação"
+                        android:textSize="13sp"
+                        android:textColor="#D1E0E5"/>
+            </LinearLayout>
+
+            <!-- TÍTULO DE SECÇÃO -->
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Explorar"
+                        android:textSize="21sp"
+                        android:textStyle="bold"
+                        android:textColor="#203746"/>
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Acessos rápidos"
+                        android:textSize="12sp"
+                        android:textColor="#829096"/>
+            </LinearLayout>
+
+            <!-- ACESSOS RÁPIDOS -->
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                <Button
+                        android:id="@+id/button1"
+                        android:layout_width="0dp"
+                        android:layout_height="128dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="7dp"
+                        android:background="@drawable/bg_card"
+                        android:backgroundTint="@null"
+                        android:drawableTop="@android:drawable/ic_menu_compass"
+                        android:drawableTint="#2F6B71"
+                        android:drawablePadding="16dp"
+                        android:gravity="center"
+                        android:text="Condomínio"
+                        android:textAllCaps="false"
+                        android:textSize="14sp"
+                        android:textColor="#203746"/>
+
+                <Button
+                        android:id="@+id/button2"
+                        android:layout_width="0dp"
+                        android:layout_height="128dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="7dp"
+                        android:background="@drawable/bg_card"
+                        android:backgroundTint="@null"
+                        android:drawableTop="@android:drawable/ic_menu_info_details"
+                        android:drawableTint="#2F6B71"
+                        android:drawablePadding="16dp"
+                        android:gravity="center"
+                        android:text="Créditos"
+                        android:textAllCaps="false"
+                        android:textSize="14sp"
+                        android:textColor="#203746"/>
+            </LinearLayout>
+
+            <!-- MENSAGEM INFORMATIVA -->
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:padding="20dp"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_card">
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Sempre perto de casa."
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:textColor="#203746"/>
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Consulta os avisos, acompanha as novidades e gere as tuas reservas num só lugar."
+                        android:textSize="13sp"
+                        android:lineSpacingExtra="3dp"
+                        android:textColor="#7C8B91"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <include
+            android:id="@+id/homeBottomNavigation"
+            layout="@layout/layout_bottom_navigation"
+            android:layout_width="0dp"
+            android:layout_height="76dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableTop="@mipmap/add_a_photo"
-            android:drawableTint="@color/androidGreen"
-            android:backgroundTint="@color/black"
-            android:text="@string/camera"
-    />
-
-    <Button
-            android:id="@+id/button2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/credits"
-            android:drawableStart="@mipmap/user"
-            android:drawableTint="@color/androidGreen"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintVertical_bias="0.97"
-    />
+            app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

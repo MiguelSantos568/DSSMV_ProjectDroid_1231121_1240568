@@ -1,110 +1,22 @@
-
-<ScrollView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
-
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="24dp">
-
-        <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Criar conta"
-                android:textSize="28sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="24dp"/>
-
-        <EditText
-                android:id="@+id/nameInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Nome completo"
-                android:inputType="textPersonName"/>
-
-        <EditText
-                android:id="@+id/emailInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Email"
-                android:inputType="textEmailAddress"/>
-
-        <EditText
-                android:id="@+id/passwordInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Password"
-                android:inputType="textPassword"/>
-
-        <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="A tua habitação"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_marginTop="28dp"
-                android:layout_marginBottom="12dp"/>
-
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Condomínio"/>
-
-        <Spinner
-                android:id="@+id/condominiumSpinner"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"/>
-
-        <TextView
-                android:id="@+id/buildingLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Prédio"
-                android:layout_marginTop="12dp"
-                android:visibility="gone"/>
-
-        <Spinner
-                android:id="@+id/buildingSpinner"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:visibility="gone"/>
-
-        <TextView
-                android:id="@+id/floorLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Andar"
-                android:layout_marginTop="12dp"
-                android:visibility="gone"/>
-        <Spinner
-                android:id="@+id/floorSpinner"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:visibility="gone"/>
-
-        <TextView
-                android:id="@+id/unitLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Número da porta"
-                android:layout_marginTop="12dp"
-                android:visibility="gone"/>
-        <Spinner
-                android:id="@+id/unitSpinner"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:visibility="gone"/>
-
-        <Button
-                android:id="@+id/registerButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Criar conta"
-                android:layout_marginTop="24dp"/>
-
+﻿<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:background="#F5F7FB">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="32dp">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/your_home" android:textSize="26sp" android:textStyle="bold" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/shared_profile_intro" android:layout_marginTop="12dp" />
+        <TextView android:id="@+id/habitationSummary" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textSize="18sp" android:layout_marginTop="24dp" />
+        <EditText android:id="@+id/nameInput" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:hint="@string/full_name" android:inputType="textPersonName" android:autofillHints="name" android:layout_marginTop="32dp" />
+        <EditText android:id="@+id/emailInput" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:hint="@string/email_label" android:inputType="textEmailAddress" android:autofillHints="emailAddress" />
+        <Button android:id="@+id/registerButton" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/enter_home" android:layout_marginTop="24dp" />
+        <Button android:id="@+id/rescanButton" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/scan_other" />
+        <TextView android:id="@+id/registrationStatus" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:accessibilityLiveRegion="polite" />
     </LinearLayout>
 </ScrollView>
