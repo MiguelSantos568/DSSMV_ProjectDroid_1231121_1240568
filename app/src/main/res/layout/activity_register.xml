@@ -1,22 +1,117 @@
-﻿<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:background="#F5F7FB">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="vertical" android:padding="32dp">
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/your_home" android:textSize="26sp" android:textStyle="bold" />
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/shared_profile_intro" android:layout_marginTop="12dp" />
-        <TextView android:id="@+id/habitationSummary" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:textSize="18sp" android:layout_marginTop="24dp" />
-        <EditText android:id="@+id/nameInput" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/full_name" android:inputType="textPersonName" android:autofillHints="name" android:layout_marginTop="32dp" />
-        <EditText android:id="@+id/emailInput" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/email_label" android:inputType="textEmailAddress" android:autofillHints="emailAddress" />
-        <Button android:id="@+id/registerButton" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/enter_home" android:layout_marginTop="24dp" />
-        <Button android:id="@+id/rescanButton" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/scan_other" />
-        <TextView android:id="@+id/registrationStatus" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:accessibilityLiveRegion="polite" />
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:id="@+id/main"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="@color/page">
+  <ScrollView
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:fillViewport="true"
+    android:clipToPadding="false"
+    app:layout_constraintWidth_max="@dimen/content_width"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent">
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:padding="@dimen/page_padding">
+      <TextView
+        style="@style/Text.Condo.Label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/home_label" />
+      <TextView
+        style="@style/Text.Condo.Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/register_title"
+        android:layout_marginTop="12dp" />
+      <TextView
+        style="@style/Text.Condo.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/shared_profile_intro"
+        android:layout_marginTop="12dp" />
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:background="@drawable/bg_card"
+        android:layout_marginTop="24dp">
+        <ImageView
+          android:layout_width="32dp"
+          android:layout_height="32dp"
+          android:src="@drawable/ic_home"
+          android:importantForAccessibility="no" />
+        <TextView
+          android:id="@+id/habitationSummary"
+          style="@style/Text.Condo.Section"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="12dp" />
+      </LinearLayout>
+      <TextView
+        style="@style/Text.Condo.Section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/contact_label"
+        android:layout_marginTop="28dp" />
+      <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="@string/full_name"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+        <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/nameInput"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:minHeight="56dp"
+          android:inputType="textPersonName"
+          android:autofillHints="name"
+          android:maxLines="1" />
+      </com.google.android.material.textfield.TextInputLayout>
+      <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="@string/email_label"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+        <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/emailInput"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:minHeight="56dp"
+          android:inputType="textEmailAddress"
+          android:autofillHints="emailAddress"
+          android:maxLines="1" />
+      </com.google.android.material.textfield.TextInputLayout>
+      <com.google.android.material.button.MaterialButton
+        android:id="@+id/registerButton"
+        style="@style/Widget.Condo.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/enter_home"
+        android:layout_marginTop="16dp" />
+      <com.google.android.material.button.MaterialButton
+        android:id="@+id/rescanButton"
+        style="@style/Widget.Condo.Button.Outline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/scan_other"
+        android:layout_marginTop="16dp" />
+      <TextView
+        android:id="@+id/registrationStatus"
+        style="@style/Text.Condo.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:accessibilityLiveRegion="polite" />
     </LinearLayout>
-</ScrollView>
+  </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,6 +13,7 @@ public class CreditsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.credits);
+        ScreenInsets.apply(this);
         Log.d("CreditsActivity", "Credits opened");
     }
 }

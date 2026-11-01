@@ -31,7 +31,7 @@ public final class HabitationService {
                 if (building == null || building.getUnits() == null) continue;
                 for (UnitDTO unit : building.getUnits()) {
                     if (unit != null && unit.getId() == unitId) {
-                        return new Habitation(unitId, condo.getName(), building.getName(),
+                        return new Habitation(unitId, condo.getId(), building.getId(), condo.getName(), building.getName(),
                                 String.valueOf(unit.getFloor()), unit.getUnitNumber());
                     }
                 }

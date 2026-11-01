@@ -1,7 +1,5 @@
 package com.example.condosched.domain.DTO;
 
-import com.example.condosched.domain.LocalTime;
-
 public class AmenityDTO {
     private long id;
     private String name;
@@ -10,13 +8,15 @@ public class AmenityDTO {
     private long buildingId;
     private boolean requiresBooking;
     private int capacity;
-    private LocalTime openingTime;
-    private LocalTime closingTime;
-    private int bookingFee;
+    private String openingTime;
+    private String closingTime;
+    private double bookingFee;
     private boolean isActive;
     private String rules;
 
-    public AmenityDTO(long id, String name, String description, String type, long buildingId, boolean requiresBooking, int capacity, LocalTime openingTime, LocalTime closingTime, int bookingFee, boolean isActive, String rules) {
+    public AmenityDTO() {}
+
+    public AmenityDTO(long id, String name, String description, String type, long buildingId, boolean requiresBooking, int capacity, String openingTime, String closingTime, double bookingFee, boolean isActive, String rules) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -59,15 +59,15 @@ public class AmenityDTO {
         this.capacity = capacity;
     }
 
-    public void setOpeningTime(LocalTime openingTime) {
+    public void setOpeningTime(String openingTime) {
         this.openingTime = openingTime;
     }
 
-    public void setClosingTime(LocalTime closingTime) {
+    public void setClosingTime(String closingTime) {
         this.closingTime = closingTime;
     }
 
-    public void setBookingFee(int bookingFee) {
+    public void setBookingFee(double bookingFee) {
         this.bookingFee = bookingFee;
     }
 
@@ -107,15 +107,15 @@ public class AmenityDTO {
         return capacity;
     }
 
-    public LocalTime getOpeningTime() {
+    public String getOpeningTime() {
         return openingTime;
     }
 
-    public LocalTime getClosingTime() {
+    public String getClosingTime() {
         return closingTime;
     }
 
-    public int getBookingFee() {
+    public double getBookingFee() {
         return bookingFee;
     }
 

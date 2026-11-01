@@ -11,7 +11,7 @@ public final class BottomNavigation {
     public static void bind(Activity activity, int selected) {
         int[] ids = {R.id.navHome, R.id.navBookings, R.id.navCondo, R.id.navProfile};
         for (int id : ids) {
-            activity.findViewById(id).setAlpha(id == selected ? 1f : 0.5f);
+            activity.findViewById(id).setSelected(id == selected);
             activity.findViewById(id).setOnClickListener(v -> {
                 if (id == selected) return;
                 if (id == R.id.navBookings) {

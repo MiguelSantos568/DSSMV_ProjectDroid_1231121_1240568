@@ -31,8 +31,6 @@ public class ProfileActivity extends AppCompatActivity {
         setText(R.id.profileFloor, home.floor);
         setText(R.id.profileUnit, home.unit);
         BottomNavigation.bind(this, R.id.navProfile);
-        findViewById(R.id.editProfileButton).setOnClickListener(v ->
-                Toast.makeText(this, "Editar perfil - em desenvolvimento", Toast.LENGTH_SHORT).show());
         findViewById(R.id.logoutButton).setOnClickListener(v -> {
             session.clear();
             startActivity(new Intent(this, LoginActivity.class).addFlags(

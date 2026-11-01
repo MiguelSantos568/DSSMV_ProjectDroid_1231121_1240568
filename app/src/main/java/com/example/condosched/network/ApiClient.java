@@ -14,11 +14,14 @@ public final class ApiClient {
                 .connectTimeout(10, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS);
     }
 
-    private static final CondominiumApi CONDOMINIUM = new Retrofit.Builder()
+    private static final Retrofit THE_CONDO = new Retrofit.Builder()
             .baseUrl("http://193.136.62.24/thecondo/api/")
             .client(httpClient().build())
             .addConverterFactory(GsonConverterFactory.create())
-            .build().create(CondominiumApi.class);
+            .build();
+
+    private static final CondominiumApi CONDOMINIUM = THE_CONDO.create(CondominiumApi.class);
+    private static final AmenityApi AMENITIES = THE_CONDO.create(AmenityApi.class);
 
     private static final HabitationProfileApi PROFILES = new Retrofit.Builder()
             .baseUrl(SupabaseClient.REST_URL + "/")
@@ -28,5 +31,6 @@ public final class ApiClient {
             .build().create(HabitationProfileApi.class);
 
     public static CondominiumApi condominiums() { return CONDOMINIUM; }
+    public static AmenityApi amenities() { return AMENITIES; }
     public static HabitationProfileApi profiles() { return PROFILES; }
 }

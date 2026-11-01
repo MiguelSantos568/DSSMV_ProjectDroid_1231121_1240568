@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="my_condominium">O meu condomínio</string>
+  <string name="amenities_intro">Consulta os espaços comuns ativos do teu condomínio.</string>
+  <string name="view_amenities">Ver comodidades</string>
+  <string name="condominium_amenities">Comodidades do condomínio</string>
+  <string name="amenities_loading">A carregar comodidades…</string>
+  <string name="amenities_empty">Não existem comodidades ativas registadas para este condomínio.</string>
+  <string name="amenities_error">Não foi possível carregar as comodidades. Verifica a ligação e tenta novamente.</string>
+  <string name="retry_amenities">Tentar novamente</string>
+  <string name="amenity_unnamed">Espaço comum</string>
+  <string name="amenity_hours">Horário: %1$s – %2$s</string>
+  <string name="amenity_time_unknown">Não indicado</string>
+  <string name="amenity_capacity">Capacidade: %1$d pessoas</string>
+  <string name="amenity_capacity_unknown">Capacidade não indicada</string>
+  <string name="amenity_building_fallback">Prédio %1$d</string>
+</resources>

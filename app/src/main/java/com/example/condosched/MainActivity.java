@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
                 R.string.unit_summary, home.building, home.floor, home.unit));
         findViewById(R.id.homeProfileImage).setOnClickListener(v -> open(ProfileActivity.class));
         findViewById(R.id.homeCondoCard).setOnClickListener(v -> open(CondominiumActivity.class));
-        findViewById(R.id.button1).setOnClickListener(v -> open(CondominiumActivity.class));
+        findViewById(R.id.button1).setOnClickListener(v -> open(AmenitiesActivity.class));
         findViewById(R.id.button2).setOnClickListener(v -> open(CreditsActivity.class));
         findViewById(R.id.homeMenuButton).setOnClickListener(v -> {
             PopupMenu menu = new PopupMenu(this, v);

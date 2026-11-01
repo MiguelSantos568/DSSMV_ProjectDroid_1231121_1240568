@@ -19,6 +19,7 @@ public final class SessionManager {
 
     public void save(Habitation home, String name, String email) {
         preferences.edit().putBoolean("serverProfile", true).putLong("unitId", home.unitId)
+                .putLong("condominiumId", home.condominiumId).putLong("buildingId", home.buildingId)
                 .putString("condominium", home.condominium).putString("building", home.building)
                 .putString("floor", home.floor).putString("unit", home.unit)
                 .putString("name", name).putString("email", email).apply();
@@ -26,6 +27,7 @@ public final class SessionManager {
 
     public Habitation getHabitation() {
         return new Habitation(preferences.getLong("unitId", 0),
+                preferences.getLong("condominiumId", 0), preferences.getLong("buildingId", 0),
                 preferences.getString("condominium", ""), preferences.getString("building", ""),
                 preferences.getString("floor", ""), preferences.getString("unit", ""));
     }

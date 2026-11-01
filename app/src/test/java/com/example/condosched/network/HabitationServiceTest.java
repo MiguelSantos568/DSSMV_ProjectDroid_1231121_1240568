@@ -18,6 +18,8 @@ public class HabitationServiceTest {
                 new TypeToken<List<CondominiumDTO>>() {}.getType());
         Habitation home = HabitationService.findIn(condos, 11);
         assertNotNull(home);
+        assertEquals(1, home.condominiumId);
+        assertEquals(1, home.buildingId);
         assertEquals("Condo A", home.condominium);
         assertEquals("Building A", home.building);
         assertEquals("2", home.floor);
