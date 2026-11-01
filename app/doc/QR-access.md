@@ -14,8 +14,8 @@ não o número da porta. A biblioteca ZXing transforma a imagem da câmara neste
 
 Um erro de ligação ou configuração não é interpretado como uma casa sem perfil.
 Dois dispositivos podem entrar no mesmo perfil. O email não é verificado e não identifica
-uma conta individual. Não são criados utilizadores no Supabase Auth nem residentes na
-TheCondo API. Os antigos AuthService e ResidentService não são usados neste fluxo.
+uma conta individual. O acesso usa o perfil partilhado da habitação, guardado na tabela
+`habitation_profiles`, sem criar utilizadores no Supabase Auth.
 
 ## Configurar o Supabase (passo necessário)
 
@@ -25,9 +25,9 @@ TheCondo API. Os antigos AuthService e ResidentService não são usados neste fl
 4. Confirmar a tabela `public.habitation_profiles` no Table Editor.
 5. Executar a app e ler o QR de exemplo.
 
-O script cria uma tabela separada e duas funções. Não altera os dados de `residents`
-nem de `auth.users`. Perfis criados no fluxo antigo não são migrados automaticamente.
-Não é preciso ativar o login anónimo do Supabase Auth.
+O script cria a tabela `habitation_profiles` e duas funções para consultar e criar perfis.
+Esta tabela é definida pela aplicação e é independente de `auth.users`, gerida pelo
+Supabase Auth. Não é preciso ativar o login anónimo do Supabase Auth.
 
 Campos guardados:
 
