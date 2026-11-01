@@ -91,6 +91,13 @@ public class AmenitiesActivity extends AppCompatActivity {
                 } else {
                     status.setVisibility(View.GONE);
                     list.setAdapter(new AmenityAdapter(AmenitiesActivity.this, amenities, buildingNames));
+                    list.setOnItemClickListener((parent, view, position, id) -> {
+                        AmenityDTO selected = amenities.get(position);
+                        startActivity(new Intent(AmenitiesActivity.this, AmenityDetailActivity.class)
+                                .putExtra(AmenityDetailActivity.EXTRA_AMENITY, selected)
+                                .putExtra(AmenityDetailActivity.EXTRA_BUILDING,
+                                        buildingNames.get(selected.getBuildingId())));
+                    });
                     list.setVisibility(View.VISIBLE);
                 }
             }

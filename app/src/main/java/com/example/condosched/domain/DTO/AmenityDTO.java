@@ -1,6 +1,9 @@
 package com.example.condosched.domain.DTO;
 
-public class AmenityDTO {
+import java.io.Serializable;
+
+public class AmenityDTO implements Serializable {
+    private static final long serialVersionUID = 1L;
     private long id;
     private String name;
     private String description;
@@ -10,7 +13,7 @@ public class AmenityDTO {
     private int capacity;
     private String openingTime;
     private String closingTime;
-    private double bookingFee;
+    private Double bookingFee;
     private boolean isActive;
     private String rules;
 
@@ -115,7 +118,7 @@ public class AmenityDTO {
         return closingTime;
     }
 
-    public double getBookingFee() {
+    public Double getBookingFee() {
         return bookingFee;
     }
 

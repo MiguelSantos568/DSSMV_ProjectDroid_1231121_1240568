@@ -42,6 +42,7 @@
         <activity android:name=".ui.CreditsActivity"/>
         <activity android:name=".ui.CondominiumActivity"/>
         <activity android:name=".ui.AmenitiesActivity"/>
+        <activity android:name=".ui.AmenityDetailActivity" android:exported="false" />
         <activity android:name=".ui.CameraActivity"/>
     </application>
 </manifest>

@@ -6,7 +6,7 @@
 - Em alternativa, abrir **Condomínio > Ver comodidades**.
 - O ecrã apresenta apenas as comodidades ativas de todos os prédios do condomínio associado à habitação do QR.
 - Cada item mostra nome, prédio, descrição, horário, capacidade e necessidade de reserva.
-- Esta etapa permite consultar a lista; detalhes e criação de reservas ficam para a próxima etapa.
+- Tocar num cartão abre os detalhes, incluindo as regras de utilização e a taxa de reserva. A criação de reservas fica para a próxima etapa.
 
 ## Dados e organização
 
@@ -45,3 +45,21 @@ Verificações manuais:
 6. Restabelecer a ligação e tocar em Tentar novamente: deve apresentar a lista.
 
 Os testes automáticos cobrem o filtro HTTP, inclusão de vários prédios do mesmo condomínio, exclusão de comodidades inativas ou de outros condomínios, horários e taxas, lista vazia, falhas HTTP, JSON inválido e ausência de ID.
+
+## Detalhes de uma comodidade
+
+- `AmenitiesActivity` abre `AmenityDetailActivity` ao selecionar um cartão.
+- O Intent transporta o `AmenityDTO` selecionado e o nome do prédio. O DTO implementa
+  `Serializable`, para o Android poder transportá-lo e recriar o ecrã quando necessário.
+- O detalhe mostra nome, descrição, localização, horários, capacidade, necessidade de
+  reserva, taxa de reserva e regras. Reutiliza a resposta da lista, sem pedido HTTP adicional.
+- `AmenityDisplay` concentra o ícone e a formatação de horários partilhados entre os dois
+  ecrãs, além da formatação da taxa.
+- A taxa é opcional: zero aparece como Sem taxa; um valor ausente aparece como Não indicada.
+  Valores positivos não recebem um símbolo monetário inventado, porque a API não indica a moeda.
+- O botão de voltar e o botão Voltar do Android regressam à mesma lista.
+- Não há criação de reservas nem alterações à base de dados nesta etapa.
+
+Teste manual: abrir piscina e ginásio, confirmar prédios e regras diferentes, voltar à lista
+sem perder a posição, rodar o dispositivo e confirmar que o detalhe continua a apresentar
+os dados selecionados. A seta e o texto Ver detalhes identificam os cartões clicáveis.

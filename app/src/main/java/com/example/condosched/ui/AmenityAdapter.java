@@ -9,17 +9,11 @@ import android.widget.TextView;
 import android.widget.ImageView;
 import com.example.condosched.R;
 import com.example.condosched.domain.DTO.AmenityDTO;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /** Associates one API amenity with one row of the ListView (Android adapters, T4). */
 public final class AmenityAdapter extends ArrayAdapter<AmenityDTO> {
-    private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("HH:mm", Locale.ROOT);
-
     private final Map<Long, String> buildingNames;
 
     public AmenityAdapter(Context context, List<AmenityDTO> amenities, Map<Long, String> buildingNames) {
@@ -27,18 +21,12 @@ public final class AmenityAdapter extends ArrayAdapter<AmenityDTO> {
         this.buildingNames = buildingNames;
     }
 
-    @Override public boolean areAllItemsEnabled() { return false; }
-    @Override public boolean isEnabled(int position) { return false; }
-
     @Override public View getView(int position, View recycled, ViewGroup parent) {
         View row = recycled == null
                 ? LayoutInflater.from(getContext()).inflate(R.layout.item_amenity, parent, false)
                 : recycled;
         AmenityDTO amenity = getItem(position);
-        String type = amenity.getType();
-        int icon = "pool".equalsIgnoreCase(type) ? R.drawable.ic_pool
-                : "gym".equalsIgnoreCase(type) ? R.drawable.ic_gym : R.drawable.ic_leaf;
-        ((ImageView) row.findViewById(R.id.amenityIcon)).setImageResource(icon);
+        ((ImageView) row.findViewById(R.id.amenityIcon)).setImageResource(AmenityDisplay.icon(amenity.getType()));
         ((TextView) row.findViewById(R.id.amenityName)).setText(
                 amenity.getName() == null || amenity.getName().trim().isEmpty()
                         ? getContext().getString(R.string.amenity_unnamed) : amenity.getName());
@@ -52,7 +40,8 @@ public final class AmenityAdapter extends ArrayAdapter<AmenityDTO> {
         description.setText(text);
         description.setVisibility(text == null || text.trim().isEmpty() ? View.GONE : View.VISIBLE);
         ((TextView) row.findViewById(R.id.amenityHours)).setText(getContext().getString(
-                R.string.amenity_hours, formatTime(amenity.getOpeningTime()), formatTime(amenity.getClosingTime())));
+                R.string.amenity_hours, AmenityDisplay.time(getContext(), amenity.getOpeningTime()),
+                AmenityDisplay.time(getContext(), amenity.getClosingTime())));
         ((TextView) row.findViewById(R.id.amenityCapacity)).setText(amenity.getCapacity() > 0
                 ? getContext().getString(R.string.amenity_capacity, amenity.getCapacity())
                 : getContext().getString(R.string.amenity_capacity_unknown));
@@ -61,14 +50,4 @@ public final class AmenityAdapter extends ArrayAdapter<AmenityDTO> {
         return row;
     }
 
-    private String formatTime(String value) {
-        if (value != null) {
-            try {
-                return LocalTime.parse(value).format(TIME);
-            } catch (DateTimeParseException ignored) {
-                // A missing or unexpected API time must not crash the list.
-            }
-        }
-        return getContext().getString(R.string.amenity_time_unknown);
-    }
 }
