@@ -1,13 +1,15 @@
 package com.example.condosched.domain.DTO;
 
-import com.example.condosched.domain.Building;
+import java.util.List;
 
 public class CondominiumDTO {
     private long id;
     private String name;
-    private Building buildings;
+    private List<BuildingDTO> buildings;
 
-    public CondominiumDTO(long id, String name, Building buildings) {
+    public CondominiumDTO() {}
+
+    public CondominiumDTO(long id, String name, List<BuildingDTO> buildings) {
         this.id = id;
         this.name = name;
         this.buildings = buildings;
@@ -29,11 +31,11 @@ public class CondominiumDTO {
         this.name = name;
     }
 
-    public Building getBuildings() {
+    public List<BuildingDTO> getBuildings() {
         return buildings;
     }
 
-    public void setBuildings(Building buildings) {
+    public void setBuildings(List<BuildingDTO> buildings) {
         this.buildings = buildings;
     }
 }

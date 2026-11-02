@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="profile_loading">Looking up the home profile…</string>
+  <string name="profile_saving">Saving your home profile…</string>
+  <string name="shared_profile_intro">Create the shared home profile. Enter the contact name and email. Everyone using this home QR code will access the same profile.</string>
+  <string name="profile_offline">Could not refresh the profile. Showing the data saved on this device.</string>
+  <string name="profile_missing">The home profile no longer exists. Scan the QR code again to register it.</string>
+  <string name="qr_scan">Scan home QR code</string>
+  <string name="qr_ready">Find the QR code inside your home, for example on the electrical panel.</string>
+  <string name="qr_prompt">Point the camera at your home QR code</string>
+  <string name="qr_cancelled">Scan cancelled or camera unavailable. Allow camera access and try again.</string>
+  <string name="qr_invalid">This QR code does not identify a CondoSched home.</string>
+  <string name="qr_loading">Looking up your home…</string>
+  <string name="home_summary">%1$s · %2$s\nFloor %3$s · Unit %4$s</string>
+  <string name="unit_summary">%1$s · Floor %2$s · Unit %3$s</string>
+  <string name="full_name">Full name</string>
+  <string name="email_label">Email</string>
+  <string name="enter_home">Enter</string>
+  <string name="scan_other">Scan another QR code</string>
+  <string name="name_required">Enter your name</string>
+  <string name="email_invalid">Enter a valid email</string>
+  <string name="logout">Sign out / change home</string>
+  <string name="take_photo">Take a photo</string>
+  <string name="bookings_pending">Bookings — coming soon</string>
+</resources>

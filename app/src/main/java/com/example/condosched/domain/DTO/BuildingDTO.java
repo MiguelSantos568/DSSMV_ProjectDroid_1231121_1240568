@@ -1,9 +1,17 @@
 package com.example.condosched.domain.DTO;
 
+import java.util.List;
+
 public class BuildingDTO {
     private long id;
     private String name;
     private long condominiumId;
+    private List<UnitDTO> units;
+
+    public BuildingDTO() {}
+
+    public List<UnitDTO> getUnits() { return units; }
+    public void setUnits(List<UnitDTO> units) { this.units = units; }
 
     public BuildingDTO(long id, String name, long condominiumId) {
         this.id = id;

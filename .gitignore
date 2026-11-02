@@ -1,0 +1,7 @@
+# Local Android/IDE configuration and generated files
+.gradle/
+.idea/
+local.properties
+**/build/
+*.iml
+*.apk

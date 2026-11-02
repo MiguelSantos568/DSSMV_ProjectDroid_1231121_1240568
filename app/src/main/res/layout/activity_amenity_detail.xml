@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/detailHeader"
+        android:layout_width="0dp"
+        android:layout_height="72dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/page_padding"
+        app:layout_constraintWidth_max="@dimen/content_width"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        <ImageButton
+            android:id="@+id/detailBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:rotation="180"
+            android:src="@drawable/ic_arrow"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/detail_back" />
+        <TextView
+            style="@style/Text.Condo.Section"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/detail_title" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        app:layout_constraintWidth_max="@dimen/content_width"
+        app:layout_constraintTop_toBottomOf="@id/detailHeader"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/page_padding">
+            <ImageView
+                android:id="@+id/detailIcon"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:padding="18dp"
+                android:background="@drawable/bg_avatar"
+                android:importantForAccessibility="no" />
+            <TextView
+                android:id="@+id/detailName"
+                style="@style/Text.Condo.Title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp" />
+            <TextView
+                android:id="@+id/detailLocation"
+                style="@style/Text.Condo.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+            <TextView
+                android:id="@+id/detailDescription"
+                style="@style/Text.Condo.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:background="@drawable/bg_card"
+                android:layout_marginTop="28dp">
+                <TextView
+                    style="@style/Text.Condo.Section"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/detail_usage" />
+                <TextView
+                    android:id="@+id/detailHours"
+                    style="@style/Text.Condo.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:textColor="@color/ink" />
+                <TextView
+                    android:id="@+id/detailCapacity"
+                    style="@style/Text.Condo.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp" />
+                <TextView
+                    android:id="@+id/detailBooking"
+                    style="@style/Text.Condo.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_badge"
+                    android:textColor="@color/primary"
+                    android:layout_marginTop="20dp" />
+                <TextView
+                    style="@style/Text.Condo.Label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/detail_fee_label"
+                    android:layout_marginTop="24dp" />
+                <TextView
+                    android:id="@+id/detailFee"
+                    style="@style/Text.Condo.Section"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:background="@drawable/bg_card"
+                android:layout_marginTop="16dp">
+                <TextView
+                    style="@style/Text.Condo.Section"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/detail_rules_label" />
+                <TextView
+                    android:id="@+id/detailRules"
+                    style="@style/Text.Condo.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="home_label">YOUR HOME</string>
+  <string name="credits_body">Meet the team behind CondoSched.</string>
+  <string name="open_menu">Open menu</string>
+  <string name="amenities_count">%1$d spaces to discover</string>
+  <string name="qr_eyebrow">WELCOME HOME</string>
+  <string name="nav_home">Home</string>
+  <string name="welcome_title">Make yourself at home.</string>
+  <string name="nav_profile">Profile</string>
+  <string name="explore_title">Your condominium, closer.</string>
+  <string name="nav_condo">Condominium</string>
+  <string name="needs_booking">Booking required</string>
+  <string name="unit_label">Door</string>
+  <string name="profile_title">A place to call yours.</string>
+  <string name="home_details">Home details</string>
+  <string name="qr_title">Your home starts here.</string>
+  <string name="qr_body">Scan the QR code in your home to discover your condominium.</string>
+  <string name="floor_label">Floor</string>
+  <string name="profile_body">The same home. One shared profile.</string>
+  <string name="nav_bookings">Bookings</string>
+  <string name="explore_body">Discover the shared spaces around you.</string>
+  <string name="shared_contact">HOME CONTACT</string>
+  <string name="free_access">No booking needed</string>
+  <string name="brand">condosched.</string>
+  <string name="spaces_label">SHARED SPACES</string>
+  <string name="building_label">Building</string>
+  <string name="register_title">Make it yours.</string>
+  <string name="welcome_body">Your home, your community and more time to enjoy both.</string>
+  <string name="profile_note">This contact is shared by everyone accessing this home.</string>
+  <string name="spaces_title">Room for your everyday.</string>
+  <string name="open_profile">Open profile</string>
+  <string name="contact_label">Contact details</string>
+</resources>

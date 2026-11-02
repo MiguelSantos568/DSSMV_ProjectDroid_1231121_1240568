@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="my_condominium">My condominium</string>
+  <string name="amenities_intro">Explore the active shared spaces in your condominium.</string>
+  <string name="view_amenities">View amenities</string>
+  <string name="condominium_amenities">Condominium amenities</string>
+  <string name="amenities_loading">Loading amenities…</string>
+  <string name="amenities_empty">There are no active amenities registered for this condominium.</string>
+  <string name="amenities_error">Could not load the amenities. Check your connection and try again.</string>
+  <string name="retry_amenities">Try again</string>
+  <string name="amenity_unnamed">Shared space</string>
+  <string name="amenity_hours">Hours: %1$s – %2$s</string>
+  <string name="amenity_time_unknown">Not provided</string>
+  <string name="amenity_capacity">Capacity: %1$d people</string>
+  <string name="amenity_capacity_unknown">Capacity not provided</string>
+  <string name="amenity_building_fallback">Building %1$d</string>
+</resources>

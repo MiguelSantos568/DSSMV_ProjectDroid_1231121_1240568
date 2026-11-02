@@ -1,0 +1,13 @@
+<resources>
+    <string name="detail_title">Detalhes do espaço</string>
+    <string name="detail_back">Voltar às comodidades</string>
+    <string name="detail_open">Ver detalhes</string>
+    <string name="detail_usage">Antes da tua visita</string>
+    <string name="detail_fee_label">Taxa de reserva</string>
+    <string name="detail_rules_label">Regras de utilização</string>
+    <string name="detail_free">Sem taxa</string>
+    <string name="detail_not_provided">Não indicada</string>
+    <string name="detail_fee_amount">%1$s (moeda não indicada)</string>
+    <string name="detail_description_missing">Não foi disponibilizada uma descrição para este espaço.</string>
+    <string name="detail_rules_missing">Não foram disponibilizadas regras. Confirma com o condomínio antes de utilizar este espaço.</string>
+</resources>

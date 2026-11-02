@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="androidGreen">#FFa4c639</color>
+  <color name="primary">#1D5148</color>
+  <color name="on_primary">#FFFFFF</color>
+  <color name="surface">#FFFFFF</color>
+  <color name="page">#F4F6F1</color>
+  <color name="ink">#193B34</color>
+  <color name="muted">#586B63</color>
+  <color name="border">#DCE5DB</color>
+  <color name="soft">#E8EFE5</color>
+  <color name="accent">#D7EBAB</color>
+  <color name="hero">#173E35</color>
+  <color name="on_hero">#FFFFFF</color>
+  <color name="hero_muted">#D0DFD3</color>
 </resources>

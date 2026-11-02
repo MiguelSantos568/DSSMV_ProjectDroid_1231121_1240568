@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="profile_loading">A consultar o perfil da habitação…</string>
+  <string name="profile_saving">A guardar o perfil da habitação…</string>
+  <string name="shared_profile_intro">Cria o perfil partilhado da habitação. Introduz o nome e email de contacto. Quem usar o QR desta casa acede ao mesmo perfil.</string>
+  <string name="profile_offline">Não foi possível atualizar o perfil. A mostrar os dados guardados neste dispositivo.</string>
+  <string name="profile_missing">O perfil da habitação já não existe. Lê novamente o QR para o registar.</string>
+  <string name="qr_scan">Ler QR da habitação</string>
+  <string name="qr_ready">O QR encontra-se na tua habitação, por exemplo no quadro elétrico.</string>
+  <string name="qr_prompt">Aponta a câmara para o QR da habitação</string>
+  <string name="qr_cancelled">Leitura cancelada ou câmara indisponível. Permite o acesso à câmara e tenta novamente.</string>
+  <string name="qr_invalid">Este QR não identifica uma habitação CondoSched.</string>
+  <string name="qr_loading">A consultar a habitação…</string>
+  <string name="home_summary">%1$s · %2$s\nAndar %3$s · Porta %4$s</string>
+  <string name="unit_summary">%1$s · Andar %2$s · Porta %3$s</string>
+  <string name="full_name">Nome completo</string>
+  <string name="email_label">Email</string>
+  <string name="enter_home">Entrar</string>
+  <string name="scan_other">Ler outro QR</string>
+  <string name="name_required">Introduz o teu nome</string>
+  <string name="email_invalid">Introduz um email válido</string>
+  <string name="logout">Sair / mudar de habitação</string>
+  <string name="take_photo">Tirar fotografia</string>
+  <string name="bookings_pending">Reservas — em desenvolvimento</string>
+</resources>

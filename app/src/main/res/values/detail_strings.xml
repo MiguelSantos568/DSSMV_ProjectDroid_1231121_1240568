@@ -1,0 +1,13 @@
+<resources>
+    <string name="detail_title">Space details</string>
+    <string name="detail_back">Back to amenities</string>
+    <string name="detail_open">View details</string>
+    <string name="detail_usage">Before your visit</string>
+    <string name="detail_fee_label">Booking fee</string>
+    <string name="detail_rules_label">Rules of use</string>
+    <string name="detail_free">No fee</string>
+    <string name="detail_not_provided">Not provided</string>
+    <string name="detail_fee_amount">%1$s (currency not specified)</string>
+    <string name="detail_description_missing">No description provided for this space.</string>
+    <string name="detail_rules_missing">No rules provided. Check with the condominium before using this space.</string>
+</resources>
