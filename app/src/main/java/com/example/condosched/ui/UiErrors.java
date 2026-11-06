@@ -26,6 +26,8 @@ final class UiErrors {
         if (error == DataError.AMENITY_UNAVAILABLE) return R.string.booking_unavailable;
         if (error == DataError.BOOKING_FAILED) return R.string.booking_failed;
         if (error == DataError.BOOKING_SERVICE_UNAVAILABLE) return R.string.booking_service_unavailable;
+        if (error == DataError.BOOKING_CANCEL_FAILED) return R.string.booking_cancel_failed;
+        if (error == DataError.NOT_FOUND) return R.string.booking_not_found;
         return R.string.connection_error;
     }
 }

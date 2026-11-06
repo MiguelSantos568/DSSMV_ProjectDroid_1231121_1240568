@@ -65,7 +65,8 @@ public class AmenitiesActivity extends SessionActivity {
         status.setVisibility(content ? View.GONE : View.VISIBLE);
         list.setVisibility(content ? View.VISIBLE : View.GONE);
         count.setVisibility(loading || error ? View.GONE : View.VISIBLE);
-        count.setText(getString(R.string.amenities_count, state.getAmenities().size()));
+        int size = state.getAmenities().size();
+        count.setText(getResources().getQuantityString(R.plurals.amenities_count, size, size));
 
         if (loading) status.setText(R.string.amenities_loading);
         else if (error) status.setText(errorMessage(state.getError()));

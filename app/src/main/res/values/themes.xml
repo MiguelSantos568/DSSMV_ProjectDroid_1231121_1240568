@@ -24,7 +24,7 @@
     <item
       name="android:windowLightStatusBar">true</item>
     <item
-      name="android:fontFamily">sans</item>
+      name="android:fontFamily">sans-serif</item>
     <item
       name="android:textColorPrimary">@color/ink</item>
     <item

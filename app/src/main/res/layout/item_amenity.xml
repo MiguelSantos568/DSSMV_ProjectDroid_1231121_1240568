@@ -70,5 +70,5 @@
     android:layout_marginTop="20dp"
     android:text="@string/detail_open"
     android:textColor="@color/primary"
-    android:drawableEnd="@drawable/ic_arrow"
+    app:drawableEndCompat="@drawable/ic_arrow"
     android:drawablePadding="12dp" /></LinearLayout>

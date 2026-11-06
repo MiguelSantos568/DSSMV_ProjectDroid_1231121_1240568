@@ -71,7 +71,8 @@ public class CreateBookingActivity extends SessionActivity {
         ((TextView) findViewById(R.id.bookingHours)).setText(getString(R.string.amenity_hours,
                 AmenityDisplay.time(this, amenity.getOpeningTime()), AmenityDisplay.time(this, amenity.getClosingTime())));
         ((TextView) findViewById(R.id.bookingCapacity)).setText(amenity.getCapacity() > 0
-                ? getString(R.string.amenity_capacity, amenity.getCapacity()) : getString(R.string.amenity_capacity_unknown));
+                ? getResources().getQuantityString(R.plurals.amenity_capacity, amenity.getCapacity(), amenity.getCapacity())
+                : getString(R.string.amenity_capacity_unknown));
         ((TextView) findViewById(R.id.bookingFee)).setText(getString(R.string.booking_fee,
                 AmenityDisplay.fee(this, amenity.getBookingFee())));
     }

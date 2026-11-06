@@ -1,34 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="home_label">A TUA CASA</string>
-  <string name="credits_body">Conhece a equipa por trÃ¡s da CondoSched.</string>
+  <string name="credits_body">Conhece a equipa por trás da CondoSched.</string>
   <string name="open_menu">Abrir menu</string>
-  <string name="amenities_count">%1$d espaÃ§os para descobrir</string>
+  <plurals name="amenities_count">
+    <item quantity="one">%1$d espaço para descobrir</item>
+    <item quantity="many">%1$d espaços para descobrir</item>
+    <item quantity="other">%1$d espaços para descobrir</item>
+  </plurals>
   <string name="qr_eyebrow">BEM-VINDO A CASA</string>
-  <string name="nav_home">InÃ­cio</string>
+  <string name="nav_home">Início</string>
   <string name="welcome_title">Sente-te em casa.</string>
   <string name="nav_profile">Perfil</string>
-  <string name="explore_title">O teu condomÃ­nio, mais perto.</string>
-  <string name="nav_condo">CondomÃ­nio</string>
+  <string name="explore_title">O teu condomínio, mais perto.</string>
+  <string name="nav_condo">Condomínio</string>
   <string name="needs_booking">Com reserva</string>
   <string name="unit_label">Porta</string>
   <string name="profile_title">Um lugar para chamar teu.</string>
-  <string name="home_details">Dados da habitaÃ§Ã£o</string>
-  <string name="qr_title">A tua casa comeÃ§a aqui.</string>
-  <string name="qr_body">LÃª o QR da tua habitaÃ§Ã£o para descobrir o teu condomÃ­nio.</string>
+  <string name="home_details">Dados da habitação</string>
+  <string name="qr_title">A tua casa começa aqui.</string>
+  <string name="qr_body">Lê o QR da tua habitação para descobrir o teu condomínio.</string>
   <string name="floor_label">Andar</string>
   <string name="profile_body">A mesma casa. Um perfil partilhado.</string>
   <string name="nav_bookings">Reservas</string>
-  <string name="explore_body">Descobre os espaÃ§os que podes aproveitar.</string>
-  <string name="shared_contact">CONTACTO DA HABITAÃ‡ÃƒO</string>
+  <string name="explore_body">Descobre os espaços que podes aproveitar.</string>
+  <string name="shared_contact">CONTACTO DA HABITAÇÃO</string>
   <string name="free_access">Sem reserva</string>
   <string name="brand">condosched.</string>
-  <string name="spaces_label">ESPAÃ‡OS COMUNS</string>
-  <string name="building_label">PrÃ©dio</string>
-  <string name="register_title">DÃ¡-lhe o teu nome.</string>
+  <string name="spaces_label">ESPAÇOS COMUNS</string>
+  <string name="building_label">Prédio</string>
+  <string name="register_title">Dá-lhe o teu nome.</string>
   <string name="welcome_body">A tua casa, a tua comunidade e mais tempo para aproveitar.</string>
-  <string name="profile_note">Este contacto Ã© partilhado por quem acede a esta habitaÃ§Ã£o.</string>
-  <string name="spaces_title">EspaÃ§o para o teu dia a dia.</string>
+  <string name="profile_note">Este contacto é partilhado por quem acede a esta habitação.</string>
+  <string name="spaces_title">Espaço para o teu dia a dia.</string>
   <string name="open_profile">Abrir perfil</string>
   <string name="contact_label">Dados de contacto</string>
 </resources>

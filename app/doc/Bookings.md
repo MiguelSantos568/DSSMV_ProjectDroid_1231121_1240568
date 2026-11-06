@@ -8,6 +8,7 @@
 4. Escolher o residente, data, horas, número de pessoas e observações opcionais.
 5. Submeter e consultar o ID e o estado devolvidos pelo servidor.
 6. Abrir o separador **Marcações** para consultar as reservas da habitação.
+7. Para desistir de uma reserva, tocar em **Cancelar marcação** e confirmar.
 
 ## Consulta das comodidades
 
@@ -33,9 +34,10 @@ Activity envia o objeto `Amenity`, que implementa Serializable, no Intent para
 | `domain/BookingValidator` | Validar período, capacidade, horário de funcionamento e sobreposições |
 | `repository/BookingRepository` | Coordenar consultas, preparar o pedido e guardar a marcação |
 | `repository/BookingMapper` | Converter DTOs de reservas e residentes para domínio |
-| `network/BookingApi` | Declarar as funções de consulta e criação de marcações no Supabase |
+| `network/BookingApi` | Declarar as funções de consulta, criação e cancelamento no Supabase |
 | `dto/BookingDTO` | Contrato JSON das reservas, com `unit_id`, `amenity_id` e horários |
 | `dto/BookingRequestDTO` | Corpo do pedido à função `create_booking` |
+| `dto/CancelBookingRequestDTO` | IDs da habitação e da reserva enviados para `cancel_booking` |
 | `network/ResidentApi` | Declarar consulta de residentes ativos |
 | `network/AmenityApi` | Declarar consulta das comodidades e respetivos detalhes |
 
@@ -43,6 +45,9 @@ A sessão identifica uma habitação. O formulário apresenta os residentes ativ
 da TheCondo cujo `unitId` corresponde a essa casa para escolher o responsável.
 O perfil de contacto do Supabase não é automaticamente um residente da TheCondo.
 Sem um residente ativo registado, a marcação não pode ser submetida.
+O ID da habitação é obtido de `HomeSession.getHome().unitId`, no modelo `Habitation`.
+O residente escolhido identifica o responsável; a reserva fica associada à casa
+por `Booking.unitId`, mesmo que esse residente deixe posteriormente de estar ativo.
 
 Antes de guardar, o Repository:
 
@@ -86,6 +91,23 @@ os residentes para listar reservas antigas.
 `ui/display/BookingDisplay` formata as datas e traduz os estados.
 A lista atualiza ao abrir ou regressar ao ecrã e tem um botão de atualização manual.
 
+## Cancelamento
+
+As reservas confirmadas e pendentes mostram o botão **Cancelar marcação**.
+`BookingsActivity` pede confirmação e entrega o ID ao `BookingsViewModel`.
+O ViewModel bloqueia pedidos repetidos e atualizações concorrentes da lista e
+chama `BookingRepository.cancelBooking`.
+
+O Repository envia `CancelBookingRequestDTO` com `p_unit_id` e `p_booking_id`
+para a função Supabase `cancel_booking`. A função só atualiza uma linha com os
+dois IDs correspondentes e muda o estado para `cancelled`. Se já estiver cancelada,
+devolve a mesma reserva; se não existir ou não puder ser cancelada, devolve uma lista vazia.
+
+O estado local só é alterado depois de o servidor confirmar o cancelamento.
+Em caso de erro, a lista mantém o estado anterior e pede que seja atualizada.
+A reserva cancelada continua no histórico, deixa de mostrar o botão e deixa de
+bloquear o horário. Não é executado `DELETE`, nem é alterada a API TheCondo.
+
 ## Pedidos e armazenamento atual
 
 | Pedido na TheCondo | Utilização |
@@ -101,6 +123,7 @@ A lista atualiza ao abrir ou regressar ao ecrã e tem um botão de atualização
 | `GET /rest/v1/rpc/get_home_bookings?p_unit_id=ID` | Listar reservas da habitação |
 | `GET /rest/v1/rpc/get_amenity_bookings?p_amenity_id=ID` | Consultar períodos ocupados |
 | `POST /rest/v1/rpc/create_booking` | Guardar a reserva e devolver uma lista com a linha criada |
+| `POST /rest/v1/rpc/cancel_booking` | Cancelar a reserva identificada por habitação e ID |
 
 O POST recebe `{"p_booking": {...}}`. O objeto tem `unit_id`, `amenity_id`,
 `resident_id`, `start_time`, `end_time`, `number_of_people`, `fee` e `notes`.
@@ -118,6 +141,9 @@ Executar no SQL Editor do projeto configurado em `SupabaseConfig`:
 2. [bookings.sql](supabase/bookings.sql), para criar a tabela, restrição e funções HTTP.
 3. Opcionalmente, [bookings_bootstrap.sql](supabase/bookings_bootstrap.sql), depois de registar a habitação 1 na app.
 
+Se a base já estava preparada antes de existir o cancelamento, executar novamente
+`bookings.sql` para instalar `cancel_booking`. O script não apaga as reservas existentes.
+
 O bootstrap insere dois horários confirmados adjacentes e um cancelado, para daqui
 a dois dias. São exemplos fictícios com IDs de referência 1; ajustar esses IDs
 se o ambiente usar outras habitações, comodidades ou residentes. Repetir o script
@@ -129,7 +155,7 @@ A consulta de disponibilidade devolve apenas comodidade, horários e estado, sem
 residentes nem observações. O acesso às reservas da casa continua a seguir o modelo
 do QR: conhecer o ID permite consultá-las; não existe autenticação individual.
 
-A app ainda não permite editar, cancelar ou apagar marcações. Também não existe
+A app ainda não permite editar ou apagar definitivamente marcações. Também não existe
 um fluxo de eventos ou pagamentos. Se a resposta ao POST falhar, deve consultar-se
 a lista antes de repetir: o servidor pode ter guardado a reserva.
 
@@ -141,6 +167,9 @@ a lista antes de repetir: o servidor pode ter guardado a reserva.
 - Testar início passado, fim anterior, horário fora do funcionamento e excesso de pessoas.
 - Testar falhas de rede e atualização da lista.
 - Rodar o formulário e verificar os valores e a ausência de submissões duplicadas.
+- Cancelar uma reserva e verificar o estado na lista e no Supabase.
+- Confirmar que o horário cancelado permite uma nova marcação.
+- Recusar a confirmação de cancelamento e verificar que nada é alterado.
 
 Os testes automáticos de domínio, Repository e ViewModel usam respostas simuladas;
 não criam reservas no servidor real. Os testes HTTP usam servidores separados para

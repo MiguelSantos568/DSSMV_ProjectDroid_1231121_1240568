@@ -24,6 +24,29 @@ Os layouts estão em `app/src/main/res/layout`: `activity_...` para ecrãs,
 Os textos estão em `values` e `values-b+pt`. Cores, estilos e dimensões são
 partilhados através dos recursos.
 
+Para estudar o funcionamento atual, seguir os modelos de `domain`: `Habitation`,
+`HabitationProfile`, `HomeSession`, `Amenity`, `Resident` e `Booking`.
+As classes e os testes do desenho inicial sem utilização foram removidos.
+O [diagrama do domínio](DomainModel.puml) representa os modelos que permanecem.
+
+## Habitação e dados da API
+
+`Habitation` é o modelo usado pela sessão e pelos ecrãs. É imutável: os campos são
+`final` e recebem os valores no construtor. Implementa Serializable para poder ser
+enviado num Intent, por exemplo do acesso por QR para o formulário de registo.
+
+| Dados de `Habitation` | Origem |
+| --- | --- |
+| `unitId`, `floor`, `unit` | `UnitDTO`: ID, andar e número da porta |
+| `buildingId`, `building` | `BuildingDTO`: ID e nome do prédio |
+| `condominiumId`, `condominium` | `CondominiumDTO`: ID e nome do condomínio |
+
+`HabitationMapper` percorre a hierarquia recebida da TheCondo e junta esses dados
+num objeto `Habitation`. Por isso não existem modelos de domínio separados para
+`Unit`, `Building` e `Condominium`; os DTOs correspondentes continuam necessários.
+`HabitationProfile` guarda o contacto da casa e `HomeSession` junta esse perfil
+à habitação. As marcações usam `Habitation.unitId` como referência à casa.
+
 ## Percurso dos dados
 
 ```text
@@ -39,6 +62,11 @@ Os DTOs têm construtor vazio, getters e setters. Os Mappers fazem a conversão
 para domínio. Os erros são devolvidos como `DataError`; os textos apresentados
 são escolhidos na interface através dos recursos.
 
+O `BookingRepository` valida IDs, datas, pessoas, estado e taxa nas respostas
+completas antes de as apresentar ou confirmar uma alteração. `cancelBooking`
+cancela uma marcação no Supabase; `cancel()` apenas interrompe um pedido HTTP
+quando o ecrã deixa de ser necessário.
+
 `UiState` representa uma operação em espera, carregamento, sucesso ou erro.
 `AmenitiesState` distingue também uma lista vazia.
 
@@ -52,7 +80,7 @@ são escolhidos na interface através dos recursos.
 | Perfil | `ProfileActivity` | `ProfileViewModel` | `HabitationProfileRepository` |
 | Lista de comodidades | `AmenitiesActivity` | `AmenitiesViewModel` | `AmenityRepository` |
 | Criar marcação | `CreateBookingActivity` | `CreateBookingViewModel` | `BookingRepository` |
-| Lista de marcações | `BookingsActivity` | `BookingsViewModel` | `BookingRepository` |
+| Lista e cancelamento de marcações | `BookingsActivity` | `BookingsViewModel` | `BookingRepository` |
 | Fotografia | `CameraActivity` | `CameraViewModel` | `PhotoRepository` |
 
 `MainActivity` e `CondominiumActivity` apresentam dados da sessão.
@@ -82,6 +110,9 @@ de consulta. A app não cria, altera ou apaga dados no servidor do professor.
 `BookingDTO` representa o JSON da tabela de reservas, com campos como `unit_id`
 e `amenity_id`. `BookingRequestDTO` envolve esse objeto no parâmetro `p_booking`
 da função de criação. O Mapper converte a resposta para o modelo `Booking`.
+`CancelBookingRequestDTO` transporta os IDs da habitação e da marcação para a
+função `cancel_booking`. A Activity confirma a intenção do utilizador; o ViewModel
+coordena o pedido e só atualiza a lista após confirmação do servidor.
 
 A base é preparada com `supabase/habitation_profiles.sql` e depois
 `supabase/bookings.sql`. O bootstrap de reservas é opcional; a ordem e os pedidos

@@ -24,12 +24,18 @@ Uma falha de rede apresenta um erro; não é tratada como ausência de perfil.
 | `domain/HabitationQr` | Validar o texto e extrair o ID |
 | `repository/HabitationRepository` | Consultar os condomínios e encontrar a habitação |
 | `repository/HabitationMapper` | Converter a hierarquia da API em `Habitation` |
+| `domain/Habitation` | Juntar os IDs e nomes do condomínio, prédio e habitação selecionada |
 | `ui/RegisterActivity` | Recolher nome e email |
 | `viewmodel/RegisterViewModel` | Validar o contacto e pedir a criação do perfil |
 | `domain/ProfileContactValidator` | Validar nome e email sem depender da interface |
 | `repository/HabitationProfileRepository` | Consultar e criar o perfil no Supabase |
 | `repository/SessionRepository` | Manter a sessão e notificar os observadores |
 | `session/SessionManager` | Ler, gravar e limpar a sessão em SharedPreferences |
+
+Na resposta da API, `CondominiumDTO` contém os prédios (`BuildingDTO`) e cada prédio
+contém as habitações (`UnitDTO`). O Mapper encontra o ID lido no QR e cria um único
+`Habitation` com o contexto necessário para os ecrãs. Não é utilizada uma classe
+de domínio `Unit` separada.
 
 As Activities observam LiveData e navegam quando a operação termina.
 `AccessViewModel.consumeResult()` marca a navegação como tratada para evitar

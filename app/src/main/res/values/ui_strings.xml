@@ -3,7 +3,10 @@
   <string name="home_label">YOUR HOME</string>
   <string name="credits_body">Meet the team behind CondoSched.</string>
   <string name="open_menu">Open menu</string>
-  <string name="amenities_count">%1$d spaces to discover</string>
+  <plurals name="amenities_count">
+    <item quantity="one">%1$d space to discover</item>
+    <item quantity="other">%1$d spaces to discover</item>
+  </plurals>
   <string name="qr_eyebrow">WELCOME HOME</string>
   <string name="nav_home">Home</string>
   <string name="welcome_title">Make yourself at home.</string>
