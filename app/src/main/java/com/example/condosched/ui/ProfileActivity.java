@@ -1,92 +1,49 @@
 package com.example.condosched.ui;
 
-import android.app.AlertDialog;
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import com.example.condosched.R;
-import com.example.condosched.auth.LoginActivity;
 import com.example.condosched.domain.Habitation;
-import com.example.condosched.domain.DTO.HabitationProfileDTO;
-import com.example.condosched.network.HabitationProfileService;
-import com.example.condosched.session.SessionManager;
+import com.example.condosched.domain.HomeSession;
+import com.example.condosched.domain.DataError;
+import com.example.condosched.viewmodel.ProfileViewModel;
+import com.example.condosched.viewmodel.UiState;
 
-public class ProfileActivity extends AppCompatActivity {
-    @Override protected void onCreate(Bundle state) {
+public class ProfileActivity extends SessionActivity {
+    @Override
+    protected void onCreate(Bundle state) {
         super.onCreate(state);
-        SessionManager session = new SessionManager(this);
-        if (!session.hasSession()) {
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return;
-        }
+        if (isFinishing()) return;
         setContentView(R.layout.activity_profile);
         ScreenInsets.apply(this);
-        Habitation home = session.getHabitation();
-        setText(R.id.profileName, session.getName());
-        setText(R.id.profileEmail, session.getEmail());
-        setText(R.id.profileCondominium, home.condominium);
-        setText(R.id.profileBuilding, home.building);
-        setText(R.id.profileFloor, home.floor);
-        setText(R.id.profileUnit, home.unit);
         BottomNavigation.bind(this, R.id.navProfile);
-        findViewById(R.id.languageButton).setOnClickListener(this::showLanguageMenu);
-        findViewById(R.id.logoutButton).setOnClickListener(v -> {
-            session.clear();
-            startActivity(new Intent(this, LoginActivity.class).addFlags(
-                    Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
-            finish();
+        onSessionChanged(currentSession());
+        findViewById(R.id.logoutButton).setOnClickListener(v -> sessionViewModel.logout());
+        ProfileViewModel viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        viewModel.getState().observe(this, result -> {
+            if (result.getStatus() != UiState.Status.ERROR) return;
+            boolean missing = result.getError() == DataError.NOT_FOUND;
+            Toast.makeText(this, missing ? R.string.profile_missing : R.string.profile_offline, Toast.LENGTH_LONG).show();
+            viewModel.consumeMessage();
+            if (missing) sessionViewModel.logout();
         });
-        refreshProfile(session, home);
+        viewModel.load();
     }
 
-    private void showLanguageMenu(View anchor) {
-        PopupMenu menu = new PopupMenu(this, anchor);
-        int current = Language.getCurrentIndex();
-
-        for (int i = 0; i < Language.NAMES.length; i++) {
-            menu.getMenu()
-                    .add(1, i, i, Language.NAMES[i])
-                    .setCheckable(true)
-                    .setChecked(i == current);
-        }
-        menu.getMenu().setGroupCheckable(1, true, true);
-
-        menu.setOnMenuItemClickListener(item -> {
-            int which = item.getItemId();
-            if (which != current) {
-                Language.setLanguage(Language.TAGS[which]);
-            }
-            return true;
-        });
-        menu.show();
+    @Override
+    protected void onSessionChanged(HomeSession session) {
+        Habitation home = session.getHome();
+        text(R.id.profileName, session.getProfile().getFullName());
+        text(R.id.profileEmail, session.getProfile().getEmail());
+        text(R.id.profileCondominium, home.condominium);
+        text(R.id.profileBuilding, home.building);
+        text(R.id.profileFloor, home.floor);
+        text(R.id.profileUnit, home.unit);
     }
 
-    private void refreshProfile(SessionManager session, Habitation home) {
-        new HabitationProfileService().find(home.unitId, new HabitationProfileService.ProfileCallback() {
-            @Override public void onSuccess(HabitationProfileDTO profile) {
-                if (isFinishing() || isDestroyed()) return;
-                if (profile == null) {
-                    session.clear();
-                    Toast.makeText(ProfileActivity.this, R.string.profile_missing, Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(ProfileActivity.this, LoginActivity.class).addFlags(
-                            Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
-                    finish();
-                    return;
-                }
-                session.save(home, profile.getFullName(), profile.getEmail());
-                setText(R.id.profileName, profile.getFullName());
-                setText(R.id.profileEmail, profile.getEmail());
-            }
-            @Override public void onError(String message) {
-                if (isFinishing() || isDestroyed()) return;
-                Toast.makeText(ProfileActivity.this, R.string.profile_offline, Toast.LENGTH_LONG).show();
-            }
-        });
+    private void text(int id, String value) {
+        ((TextView) findViewById(id)).setText(value);
     }
-    private void setText(int id, String value) { ((TextView) findViewById(id)).setText(value); }
 }

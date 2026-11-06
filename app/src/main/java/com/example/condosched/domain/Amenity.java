@@ -1,34 +1,25 @@
 package com.example.condosched.domain;
 
-public class Amenity {
+import java.io.Serializable;
+import java.time.LocalTime;
+
+public class Amenity implements Serializable {
+    private static final long serialVersionUID = 1L;
     private long id;
     private String name;
     private String description;
     private String type;
     private long buildingId;
+    private String buildingName;
     private boolean requiresBooking;
     private int capacity;
     private LocalTime openingTime;
     private LocalTime closingTime;
-    private int bookingFee;
+    private Double bookingFee;
     private boolean isActive;
     private String rules;
 
-    public Amenity() {}
-
-    public Amenity(long id, String name, String description, String type, long buildingId, boolean requiresBooking, int capacity, LocalTime openingTime, LocalTime closingTime, int bookingFee, boolean isActive, String rules) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.type = type;
-        this.buildingId = buildingId;
-        this.requiresBooking = requiresBooking;
-        this.capacity = capacity;
-        this.openingTime = openingTime;
-        this.closingTime = closingTime;
-        this.bookingFee = bookingFee;
-        this.isActive = isActive;
-        this.rules = rules;
+    public Amenity() {
     }
 
     public long getId() {
@@ -71,6 +62,14 @@ public class Amenity {
         this.buildingId = buildingId;
     }
 
+    public String getBuildingName() {
+        return buildingName;
+    }
+
+    public void setBuildingName(String buildingName) {
+        this.buildingName = buildingName;
+    }
+
     public boolean isRequiresBooking() {
         return requiresBooking;
     }
@@ -103,11 +102,11 @@ public class Amenity {
         this.closingTime = closingTime;
     }
 
-    public int getBookingFee() {
+    public Double getBookingFee() {
         return bookingFee;
     }
 
-    public void setBookingFee(int bookingFee) {
+    public void setBookingFee(Double bookingFee) {
         this.bookingFee = bookingFee;
     }
 

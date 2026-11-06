@@ -1,0 +1,8 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="24dp">
+    <ImageButton android:id="@+id/photoBack" android:layout_width="48dp" android:layout_height="48dp" android:padding="12dp" android:rotation="180" android:src="@drawable/ic_arrow" android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/back"/>
+    <TextView style="@style/Text.Condo.Title" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/take_photo" android:layout_marginTop="16dp"/>
+    <TextView android:id="@+id/photoStatus" style="@style/Text.Condo.Body" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:accessibilityLiveRegion="polite"/>
+    <ImageView android:id="@+id/photoPreview" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:layout_marginVertical="20dp" android:contentDescription="@string/photo_preview" android:adjustViewBounds="true" android:scaleType="fitCenter"/>
+    <com.google.android.material.button.MaterialButton android:id="@+id/takePhotoButton" style="@style/Widget.Condo.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/camera"/>
+    <com.google.android.material.button.MaterialButton android:id="@+id/savePhotoButton" style="@style/Widget.Condo.Button.Outline" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="@string/save"/>
+</LinearLayout>

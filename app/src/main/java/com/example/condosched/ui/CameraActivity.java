@@ -1,117 +1,80 @@
 package com.example.condosched.ui;
 
+import android.Manifest;
 import android.content.ActivityNotFoundException;
-import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.net.Uri;
-import android.os.Environment;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.os.Bundle;
-import android.provider.MediaStore;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 import com.example.condosched.R;
-import android.util.Log;
+import com.example.condosched.viewmodel.CameraViewModel;
+import com.example.condosched.viewmodel.UiState;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-
-public class CameraActivity extends AppCompatActivity {
-    Button buttonPicture; Button buttonSave;
-    ImageView imageView;
-    TextView textView;
-    ActivityResultLauncher<Intent> activityResultLauncher;
-    Bitmap imageBitmap;
+public class CameraActivity extends SessionActivity {
+    private CameraViewModel viewModel;
+    private final ActivityResultLauncher<Void> camera = registerForActivityResult(
+            new ActivityResultContracts.TakePicturePreview(), image -> viewModel.capture(image));
+    private final ActivityResultLauncher<String> cameraPermission = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), allowed -> {
+                if (allowed) openCamera();
+                else message(R.string.camera_permission);
+            });
+    private final ActivityResultLauncher<String> storagePermission = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), allowed -> {
+                if (allowed) viewModel.save();
+                else message(R.string.storage_permission);
+            });
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.camera);
-
-        buttonPicture = findViewById(R.id.camera_id);
-        buttonSave = findViewById(R.id.save);
-        imageView = findViewById(R.id.image);
-
-        activityResultLauncher = registerForActivityResult( // Activity result para apanhar resultado da camara
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == RESULT_OK) {
-                        Intent data = result.getData();
-                        if (data != null && data.getExtras() != null) {
-                            imageBitmap = (Bitmap) data.getExtras().get("data"); // BitMap da Camara
-                            imageView.setImageBitmap(imageBitmap);
-                            Log.d("CameraActivity", "Image received and displayed");
-                        }
-                    } else {
-                        Log.d("CameraActivity", "Camera capture cancelled or failed");
-                    }
-                }
-        );
-
-        buttonPicture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                try {
-                    activityResultLauncher.launch(takePictureIntent);
-                    Log.d("CameraActivity", "Requested image capture");
-                } catch (ActivityNotFoundException e) {
-                    Log.d("CameraActivity", "Unable to request image capture");
-                }
+    protected void onCreate(Bundle state) {
+        super.onCreate(state);
+        if (isFinishing()) return;
+        setContentView(R.layout.activity_camera);
+        ScreenInsets.apply(this);
+        viewModel = new ViewModelProvider(this).get(CameraViewModel.class);
+        viewModel.getState().observe(this, result -> {
+            boolean saving = result.getStatus() == UiState.Status.LOADING;
+            ((ImageView) findViewById(R.id.photoPreview)).setImageBitmap(result.getData());
+            findViewById(R.id.takePhotoButton).setEnabled(!saving);
+            findViewById(R.id.savePhotoButton).setEnabled(result.getData() != null && !saving);
+            ((TextView) findViewById(R.id.photoStatus)).setText(saving ? R.string.photo_saving
+                    : result.getStatus() == UiState.Status.ERROR ? R.string.photo_error : R.string.photo_hint);
+        });
+        viewModel.getSavedPhoto().observe(this, uri -> {
+            if (uri != null) {
+                message(R.string.photo_saved);
+                viewModel.consumeSavedPhoto();
             }
         });
-
-        buttonSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // create string with date to systematize the saved files
-                DateFormat dateFormat = new SimpleDateFormat("dd_MM_yy-HH_mm_ss");
-                Date today = Calendar.getInstance().getTime();
-                String date= dateFormat .format(today);
-
-                // create File to be saved
-                File imageFile = new File(getFilesDir(), "capture_" + date + ".png");
-
-                ContentValues values = new ContentValues();
-                values.put(MediaStore.Images.Media.DISPLAY_NAME, imageFile.getName());
-                values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
-
-                // Save to Pictures/CondoSched
-                values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/CondoSched");
-
-                ContentResolver resolver = getContentResolver();
-                Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
-                if (imageUri != null) {
-                    try (OutputStream out = resolver.openOutputStream(imageUri)) {
-                        if (out != null) {
-                            // convert Bitmap to PNG
-                            imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-                            String imageLocation = "Pictures/CondoSched/" + imageFile.getName();
-
-                            // Success Toast + Log
-                            String locationMessage = "Saved to: " + imageLocation;
-                            Toast.makeText(CameraActivity.this, locationMessage, Toast.LENGTH_LONG).show();
-                            Log.d("CameraActivity", "Capture saved to: " + imageLocation);
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+        findViewById(R.id.photoBack).setOnClickListener(v -> finish());
+        findViewById(R.id.takePhotoButton).setOnClickListener(v -> {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
+                openCamera();
+            else cameraPermission.launch(Manifest.permission.CAMERA);
         });
+        findViewById(R.id.savePhotoButton).setOnClickListener(v -> {
+            if (Build.VERSION.SDK_INT <= 28 && ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                storagePermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            } else viewModel.save();
+        });
+    }
+
+    private void openCamera() {
+        try {
+            camera.launch(null);
+        } catch (ActivityNotFoundException error) {
+            message(R.string.camera_unavailable);
+        }
+    }
+
+    private void message(int resource) {
+        Toast.makeText(this, resource, Toast.LENGTH_LONG).show();
     }
 }

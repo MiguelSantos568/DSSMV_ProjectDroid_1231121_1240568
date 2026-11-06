@@ -5,7 +5,8 @@ public class Building {
     private String name;
     private long condominiumId;
 
-    public Building() {}
+    public Building() {
+    }
 
     public Building(long id, String name, long condominiumId) {
         this.id = id;

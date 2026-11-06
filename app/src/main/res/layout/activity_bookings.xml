@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="@dimen/page_padding">
+        <TextView style="@style/Text.Condo.Title" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="@string/bookings_title" />
+        <TextView style="@style/Text.Condo.Body" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="@string/bookings_intro" android:layout_marginTop="12dp" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/bookingsRefresh"
+            style="@style/Widget.Condo.Button.Outline" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="@string/bookings_refresh" android:layout_marginTop="12dp" />
+        <TextView android:id="@+id/bookingsStatus" style="@style/Text.Condo.Body"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:accessibilityLiveRegion="polite" />
+    </LinearLayout>
+    <ListView android:id="@+id/bookingsList" android:layout_width="match_parent"
+        android:layout_height="0dp" android:layout_weight="1" android:divider="@null"
+        android:paddingHorizontal="@dimen/page_padding" android:clipToPadding="false" />
+    <include layout="@layout/layout_bottom_navigation" />
+</LinearLayout>

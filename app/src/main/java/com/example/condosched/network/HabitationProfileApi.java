@@ -1,8 +1,10 @@
 package com.example.condosched.network;
 
-import com.example.condosched.domain.DTO.HabitationProfileDTO;
-import com.example.condosched.domain.DTO.ProfileRequestDTO;
+import com.example.condosched.dto.HabitationProfileDTO;
+import com.example.condosched.dto.ProfileRequestDTO;
+
 import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;

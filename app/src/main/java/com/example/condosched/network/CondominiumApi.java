@@ -1,7 +1,9 @@
 package com.example.condosched.network;
 
-import com.example.condosched.domain.DTO.CondominiumDTO;
+import com.example.condosched.dto.CondominiumDTO;
+
 import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.http.GET;
 

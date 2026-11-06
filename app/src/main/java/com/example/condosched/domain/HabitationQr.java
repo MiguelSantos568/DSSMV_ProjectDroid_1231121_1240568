@@ -5,7 +5,9 @@ import java.util.regex.Pattern;
 
 public final class HabitationQr {
     private static final Pattern FORMAT = Pattern.compile("condosched://unit/([1-9][0-9]*)");
-    private HabitationQr() {}
+
+    private HabitationQr() {
+    }
 
     public static long parse(String content) {
         Matcher match = FORMAT.matcher(content == null ? "" : content.trim());

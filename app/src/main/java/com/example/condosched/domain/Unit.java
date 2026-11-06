@@ -13,7 +13,8 @@ public class Unit {
     private int monthlyFee;
     private int permillage;
 
-    public Unit() {}
+    public Unit() {
+    }
 
     public Unit(long id, String unitNumber, long buildingId, int floor, String type, int area, int bedrooms, int bathrooms, String status, int monthlyFee, int permillage) {
         this.id = id;

@@ -1,4 +1,3 @@
-
 package com.example.condosched.domain;
 
 import java.util.List;
@@ -11,7 +10,8 @@ public class Condominium {
     private List<Building> buildingsList;
     private Coordinates coordinates;
 
-    public Condominium() {}
+    public Condominium() {
+    }
 
     public Condominium(long id, String name, Building buildings,
                        double latitude, double longitude) {

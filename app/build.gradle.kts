@@ -33,6 +33,9 @@ android {
 }
 
 dependencies {
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-livedata:2.6.2")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
     implementation("com.squareup.retrofit2:retrofit:3.0.0")
     implementation("com.squareup.retrofit2:converter-gson:3.0.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
