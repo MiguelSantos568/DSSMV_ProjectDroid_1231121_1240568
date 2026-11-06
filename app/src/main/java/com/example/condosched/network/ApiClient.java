@@ -1,36 +1,74 @@
 package com.example.condosched.network;
 
 import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-/** Two independent clients: the Supabase key is never sent to TheCondo. */
+/**
+ * Two independent clients: the Supabase key is never sent to TheCondo.
+ */
 public final class ApiClient {
-    private ApiClient() {}
+    private static final String THE_CONDO_URL = "http://193.136.62.24/thecondo/api/";
 
-    private static OkHttpClient.Builder httpClient() {
+    // As duas instâncias impedem o envio da chave Supabase para a TheCondo.
+    private static final Retrofit THE_CONDO = createTheCondoClient();
+    private static final Retrofit SUPABASE = createSupabaseClient();
+
+    private static final CondominiumApi CONDOMINIUM = THE_CONDO.create(CondominiumApi.class);
+    private static final AmenityApi AMENITIES = THE_CONDO.create(AmenityApi.class);
+    private static final BookingApi BOOKINGS = SUPABASE.create(BookingApi.class);
+    private static final ResidentApi RESIDENTS = THE_CONDO.create(ResidentApi.class);
+    private static final HabitationProfileApi PROFILES = SUPABASE.create(HabitationProfileApi.class);
+
+    private ApiClient() {
+    }
+
+    private static OkHttpClient.Builder createHttpClient() {
         return new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS);
     }
 
-    private static final Retrofit THE_CONDO = new Retrofit.Builder()
-            .baseUrl("http://193.136.62.24/thecondo/api/")
-            .client(httpClient().build())
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
+    private static Retrofit createTheCondoClient() {
+        return new Retrofit.Builder()
+                .baseUrl(THE_CONDO_URL)
+                .client(createHttpClient().build())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+    }
 
-    private static final CondominiumApi CONDOMINIUM = THE_CONDO.create(CondominiumApi.class);
-    private static final AmenityApi AMENITIES = THE_CONDO.create(AmenityApi.class);
+    private static Retrofit createSupabaseClient() {
+        OkHttpClient client = createHttpClient()
+                .addInterceptor(chain -> chain.proceed(chain.request().newBuilder()
+                        .header("apikey", SupabaseConfig.SUPABASE_KEY)
+                        .build()))
+                .build();
 
-    private static final HabitationProfileApi PROFILES = new Retrofit.Builder()
-            .baseUrl(SupabaseClient.REST_URL + "/")
-            .client(httpClient().addInterceptor(chain -> chain.proceed(chain.request().newBuilder()
-                    .header("apikey", SupabaseClient.SUPABASE_KEY).build())).build())
-            .addConverterFactory(GsonConverterFactory.create())
-            .build().create(HabitationProfileApi.class);
+        return new Retrofit.Builder()
+                .baseUrl(SupabaseConfig.REST_URL + "/")
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+    }
 
-    public static CondominiumApi condominiums() { return CONDOMINIUM; }
-    public static AmenityApi amenities() { return AMENITIES; }
-    public static HabitationProfileApi profiles() { return PROFILES; }
+    public static CondominiumApi condominiums() {
+        return CONDOMINIUM;
+    }
+
+    public static AmenityApi amenities() {
+        return AMENITIES;
+    }
+
+    public static BookingApi bookings() {
+        return BOOKINGS;
+    }
+
+    public static ResidentApi residents() {
+        return RESIDENTS;
+    }
+
+    public static HabitationProfileApi profiles() {
+        return PROFILES;
+    }
 }

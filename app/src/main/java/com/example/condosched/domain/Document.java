@@ -15,7 +15,8 @@ public class Document {
     private boolean isPublic;
     private String publishedDate;
 
-    public Document() {}
+    public Document() {
+    }
 
     public Document(long id, String title, String description, String documentType, String fileName, String filePath,
                     String mimeType, long fileSize, long unitId, long maintenanceRequestId,

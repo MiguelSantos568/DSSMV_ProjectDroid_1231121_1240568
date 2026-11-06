@@ -5,118 +5,77 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import com.example.condosched.R;
-import com.example.condosched.auth.LoginActivity;
+import com.example.condosched.domain.Amenity;
+import com.example.condosched.ui.adapter.AmenityAdapter;
 import com.example.condosched.domain.Habitation;
-import com.example.condosched.domain.DTO.AmenityDTO;
-import com.example.condosched.network.AmenityService;
-import com.example.condosched.network.HabitationService;
-import com.example.condosched.session.SessionManager;
-import java.util.List;
-import java.util.Map;
+import com.example.condosched.domain.DataError;
+import com.example.condosched.viewmodel.AmenitiesState;
+import com.example.condosched.viewmodel.AmenitiesViewModel;
 
-public class AmenitiesActivity extends AppCompatActivity {
-    private SessionManager session;
-    private TextView status, context;
+/**
+ * Displays state and forwards user actions. Network requests belong to the Repository.
+ */
+public class AmenitiesActivity extends SessionActivity {
+    private TextView status, context, count;
     private View progress, retry;
     private ListView list;
-    private final AmenityService service = new AmenityService();
 
-    @Override protected void onCreate(Bundle state) {
-        super.onCreate(state);
-        session = new SessionManager(this);
-        if (!session.hasSession()) {
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return;
-        }
-        setContentView(R.layout.amenitiesgrid);
+    @Override
+    protected void onCreate(Bundle savedState) {
+        super.onCreate(savedState);
+        if (isFinishing()) return;
+        setContentView(R.layout.activity_amenities);
         ScreenInsets.apply(this);
         status = findViewById(R.id.amenitiesStatus);
         context = findViewById(R.id.amenitiesContext);
+        count = findViewById(R.id.amenitiesCount);
         progress = findViewById(R.id.amenitiesProgress);
         retry = findViewById(R.id.retryAmenitiesButton);
         list = findViewById(R.id.amenitiesList);
         BottomNavigation.bind(this, R.id.navCondo);
-        // Amenities is a child screen of Condominium; the tab also returns to its overview.
         findViewById(R.id.navCondo).setOnClickListener(v -> startActivity(
                 new Intent(this, CondominiumActivity.class).addFlags(
                         Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP)));
-        retry.setOnClickListener(v -> load());
-        load();
-    }
-
-    private void load() {
-        findViewById(R.id.amenitiesCount).setVisibility(View.GONE);
-        progress.setVisibility(View.VISIBLE);
-        retry.setVisibility(View.GONE);
-        list.setVisibility(View.GONE);
-        status.setVisibility(View.VISIBLE);
-        status.setText(R.string.amenities_loading);
-        Habitation home = session.getHabitation();
-        showContext(home);
-        if (home.condominiumId > 0) {
-            loadCondominium(home);
-        } else {
-            // Sessions saved before condominium IDs were introduced remain valid.
-            new HabitationService().find(home.unitId, new HabitationService.Callback() {
-                @Override public void onSuccess(Habitation resolved) {
-                    if (isFinishing() || isDestroyed()) return;
-                    session.save(resolved, session.getName(), session.getEmail());
-                    showContext(resolved);
-                    loadCondominium(resolved);
-                }
-                @Override public void onError(String message) {
-                    if (!isFinishing() && !isDestroyed()) showError();
-                }
-            });
-        }
-    }
-
-    private void showContext(Habitation home) {
-        context.setText(home.condominium);
-    }
-
-    private void loadCondominium(Habitation home) {
-        service.getByCondominium(home.condominiumId, new AmenityService.AmenityCallback() {
-            @Override public void onSuccess(List<AmenityDTO> amenities, Map<Long, String> buildingNames) {
-                if (isFinishing() || isDestroyed()) return;
-                progress.setVisibility(View.GONE);
-                TextView count = findViewById(R.id.amenitiesCount);
-                count.setText(getString(R.string.amenities_count, amenities.size()));
-                count.setVisibility(View.VISIBLE);
-                if (amenities.isEmpty()) {
-                    status.setText(R.string.amenities_empty);
-                } else {
-                    status.setVisibility(View.GONE);
-                    list.setAdapter(new AmenityAdapter(AmenitiesActivity.this, amenities, buildingNames));
-                    list.setOnItemClickListener((parent, view, position, id) -> {
-                        AmenityDTO selected = amenities.get(position);
-                        startActivity(new Intent(AmenitiesActivity.this, AmenityDetailActivity.class)
-                                .putExtra(AmenityDetailActivity.EXTRA_AMENITY, selected)
-                                .putExtra(AmenityDetailActivity.EXTRA_BUILDING,
-                                        buildingNames.get(selected.getBuildingId())));
-                    });
-                    list.setVisibility(View.VISIBLE);
-                }
-            }
-            @Override public void onError() {
-                if (!isFinishing() && !isDestroyed()) showError();
-            }
+        list.setOnItemClickListener((parent, view, position, id) -> {
+            Amenity selected = (Amenity) parent.getItemAtPosition(position);
+            startActivity(new Intent(this, AmenityDetailActivity.class)
+                    .putExtra(AmenityDetailActivity.EXTRA_AMENITY, selected));
         });
+
+        AmenitiesViewModel viewModel = new ViewModelProvider(this).get(AmenitiesViewModel.class);
+        viewModel.getState().observe(this, this::render);
+        retry.setOnClickListener(v -> viewModel.retry());
+        viewModel.load(currentSession().getHome());
     }
 
-    private void showError() {
-        progress.setVisibility(View.GONE);
-        list.setVisibility(View.GONE);
-        status.setText(R.string.amenities_error);
-        status.setVisibility(View.VISIBLE);
-        retry.setVisibility(View.VISIBLE);
+    private void render(AmenitiesState state) {
+        Habitation home = state.getHome();
+        context.setText(home.condominium);
+        // Preserve support for sessions created before condominium IDs were stored locally.
+        if (currentSession().getHome().condominiumId == 0 && home.condominiumId > 0) {
+            sessionViewModel.updateHome(home);
+        }
+        boolean loading = state.getStatus() == AmenitiesState.Status.LOADING;
+        boolean error = state.getStatus() == AmenitiesState.Status.ERROR;
+        boolean content = state.getStatus() == AmenitiesState.Status.CONTENT;
+        progress.setVisibility(loading ? View.VISIBLE : View.GONE);
+        retry.setVisibility(error ? View.VISIBLE : View.GONE);
+        status.setVisibility(content ? View.GONE : View.VISIBLE);
+        list.setVisibility(content ? View.VISIBLE : View.GONE);
+        count.setVisibility(loading || error ? View.GONE : View.VISIBLE);
+        count.setText(getString(R.string.amenities_count, state.getAmenities().size()));
+
+        if (loading) status.setText(R.string.amenities_loading);
+        else if (error) status.setText(errorMessage(state.getError()));
+        else if (!content) status.setText(R.string.amenities_empty);
+        else list.setAdapter(new AmenityAdapter(this, state.getAmenities()));
     }
 
-    @Override protected void onDestroy() {
-        service.cancel();
-        super.onDestroy();
+    private int errorMessage(DataError error) {
+        if (error == DataError.HOME_UNAVAILABLE) return R.string.amenities_home_error;
+        if (error == DataError.INVALID_RESPONSE) return R.string.amenities_data_error;
+        return R.string.amenities_error;
     }
 }

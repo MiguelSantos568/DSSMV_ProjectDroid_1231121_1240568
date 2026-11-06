@@ -123,7 +123,7 @@
         android:text="@string/explore_body"
         android:layout_marginTop="6dp" />
       <com.google.android.material.button.MaterialButton
-        android:id="@+id/button1"
+        android:id="@+id/homeAmenitiesButton"
         style="@style/Widget.Condo.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -131,7 +131,7 @@
         android:layout_marginTop="16dp"
         app:icon="@drawable/ic_leaf" />
       <com.google.android.material.button.MaterialButton
-        android:id="@+id/button2"
+        android:id="@+id/homeCreditsButton"
         style="@style/Widget.Condo.Button.Outline"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

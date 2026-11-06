@@ -32,7 +32,15 @@ public final class SessionManager {
                 preferences.getString("floor", ""), preferences.getString("unit", ""));
     }
 
-    public String getName() { return preferences.getString("name", ""); }
-    public String getEmail() { return preferences.getString("email", ""); }
-    public void clear() { preferences.edit().clear().apply(); }
+    public String getName() {
+        return preferences.getString("name", "");
+    }
+
+    public String getEmail() {
+        return preferences.getString("email", "");
+    }
+
+    public void clear() {
+        preferences.edit().clear().apply();
+    }
 }

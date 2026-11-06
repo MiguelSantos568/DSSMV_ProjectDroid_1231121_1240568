@@ -1,4 +1,4 @@
--- Run this once in the Supabase SQL Editor for the project configured in SupabaseClient.
+-- Run this once in the Supabase SQL Editor for the project configured in SupabaseConfig.
 -- Creates a shared habitation profile table, separate from Supabase Auth (auth.users).
 -- Access model for this prototype: knowing the unit ID (the QR content) grants access.
 begin;

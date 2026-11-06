@@ -7,7 +7,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public final class ScreenInsets {
-    private ScreenInsets() {}
+    private ScreenInsets() {
+    }
+
     public static void apply(Activity activity) {
         View content = activity.findViewById(android.R.id.content);
         ViewCompat.setOnApplyWindowInsetsListener(content, (view, insets) -> {

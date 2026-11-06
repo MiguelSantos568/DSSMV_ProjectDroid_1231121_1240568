@@ -7,14 +7,20 @@ public class Coordinates {
     private double longitude;
 
     // constructors
-    public Coordinates() {}
+    public Coordinates() {
+    }
+
     public Coordinates(double latitude, double longitude) {
-        if(latitude < 0 || latitude > 90){
+        if (latitude < 0 || latitude > 90) {
             throw new IllegalArgumentException("Latitude must be between 0 and 90");
-        }else{this.latitude = latitude;}
-        if(longitude < 0 || longitude > 180){
+        } else {
+            this.latitude = latitude;
+        }
+        if (longitude < 0 || longitude > 180) {
             throw new IllegalArgumentException("Longitude must be between 0 and 180");
-        }else{this.longitude = longitude;}
+        } else {
+            this.longitude = longitude;
+        }
 
     }
 
@@ -36,14 +42,14 @@ public class Coordinates {
     }
 
     // other methods
-    public double distanceTo(Coordinates coordinates){
+    public double distanceTo(Coordinates coordinates) {
         double deltaLatitude = this.latitude - coordinates.latitude;
         double deltaLongitude = this.longitude - coordinates.longitude;
 
         return Math.sqrt(Math.pow(deltaLatitude, 2) + Math.pow(deltaLongitude, 2));
     }
 
-    public String toNotatedText(Coordinates coordinates){
+    public String toNotatedText(Coordinates coordinates) {
         return "lat:" + coordinates.latitude + ";lon:" + coordinates.longitude;
     }
 }

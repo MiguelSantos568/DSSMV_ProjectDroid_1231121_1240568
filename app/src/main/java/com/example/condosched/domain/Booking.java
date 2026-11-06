@@ -2,19 +2,22 @@ package com.example.condosched.domain;
 
 public class Booking {
     private long id;
+    private long unitId;
     private long amenityId;
+    private String amenityName;
     private long residentId;
     private String startTime;
     private String endTime;
     private String status;
     private int numberOfGuests;
-    private int fee;
+    private Double fee = 0.0;
     private String notes;
 
-    public Booking() {}
+    public Booking() {
+    }
 
     public Booking(long id, long amenityId, long residentId, String startTime, String endTime, String status,
-                   int numberOfGuests, int fee, String notes) {
+                   int numberOfGuests, double fee, String notes) {
         this.id = id;
         this.amenityId = amenityId;
         this.residentId = residentId;
@@ -34,12 +37,28 @@ public class Booking {
         this.id = id;
     }
 
+    public long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(long unitId) {
+        this.unitId = unitId;
+    }
+
     public long getAmenityId() {
         return amenityId;
     }
 
     public void setAmenityId(long amenityId) {
         this.amenityId = amenityId;
+    }
+
+    public String getAmenityName() {
+        return amenityName;
+    }
+
+    public void setAmenityName(String amenityName) {
+        this.amenityName = amenityName;
     }
 
     public long getResidentId() {
@@ -82,11 +101,11 @@ public class Booking {
         this.numberOfGuests = numberOfGuests;
     }
 
-    public int getFee() {
+    public Double getFee() {
         return fee;
     }
 
-    public void setFee(int fee) {
+    public void setFee(Double fee) {
         this.fee = fee;
     }
 

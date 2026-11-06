@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="profile_loading">A consultar o perfil da habitação…</string>
   <string name="profile_saving">A guardar o perfil da habitação…</string>
   <string name="shared_profile_intro">Cria o perfil partilhado da habitação. Introduz o nome e email de contacto. Quem usar o QR desta casa acede ao mesmo perfil.</string>
   <string name="profile_offline">Não foi possível atualizar o perfil. A mostrar os dados guardados neste dispositivo.</string>
@@ -21,5 +20,4 @@
   <string name="email_invalid">Introduz um email válido</string>
   <string name="logout">Sair / mudar de habitação</string>
   <string name="take_photo">Tirar fotografia</string>
-  <string name="bookings_pending">Reservas — em desenvolvimento</string>
 </resources>

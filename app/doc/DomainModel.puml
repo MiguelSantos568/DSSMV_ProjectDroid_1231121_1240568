@@ -35,11 +35,12 @@ class "Amenity"{
     - description: String
     - type: String
     - buildingId: long
+    - buildingName: String
     - requiresBooking: boolean
     - capacity: int
     - openingTime: LocalTime
     - closingTime: LocalTime
-    - bookingFee: int
+    - bookingFee: Double
     - isActive: boolean
     - rules: String
 }
@@ -48,8 +49,8 @@ class "Booking"{
     - id: long
     - amenityId: long
     - residentId: long
-    - startTime: LocalTime
-    - endTime: LocalTime
+    - startTime: String
+    - endTime: String
     - status: String
     - numberOfGuests: int
     - fee: int
@@ -90,12 +91,7 @@ class "Unit"{
     - permillage: int
 }
 
-class "LocalTime"{
-    - hour: int
-    - minute: int
-    - second: int
-    - nano: int
-}
+class "LocalTime" <<java.time>>
 
 class "Event"{
     - name: String
@@ -108,7 +104,7 @@ class "Event"{
 '----- Connections -----
 
 "Coordinates" -right. "Condominium"
-"LocalTime" -. "Booking"
+"LocalTime" -. "Amenity"
 
 "Building" "1..*"--"1" "Condominium" : "contains"
 "Amenity" "1..*"--"1" "Building" : "contains"

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="amenities_home_error">Não foi possível identificar o teu condomínio. Verifica a ligação e tenta novamente.</string>
+  <string name="amenities_data_error">Os dados das comodidades recebidos são inválidos. Tenta novamente.</string>
   <string name="my_condominium">O meu condomínio</string>
   <string name="amenities_intro">Consulta os espaços comuns ativos do teu condomínio.</string>
   <string name="view_amenities">Ver comodidades</string>
