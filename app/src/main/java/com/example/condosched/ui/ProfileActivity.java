@@ -1,7 +1,10 @@
 package com.example.condosched.ui;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,6 +34,7 @@ public class ProfileActivity extends AppCompatActivity {
         setText(R.id.profileFloor, home.floor);
         setText(R.id.profileUnit, home.unit);
         BottomNavigation.bind(this, R.id.navProfile);
+        findViewById(R.id.languageButton).setOnClickListener(this::showLanguageMenu);
         findViewById(R.id.logoutButton).setOnClickListener(v -> {
             session.clear();
             startActivity(new Intent(this, LoginActivity.class).addFlags(
@@ -38,6 +42,28 @@ public class ProfileActivity extends AppCompatActivity {
             finish();
         });
         refreshProfile(session, home);
+    }
+
+    private void showLanguageMenu(View anchor) {
+        PopupMenu menu = new PopupMenu(this, anchor);
+        int current = Language.getCurrentIndex();
+
+        for (int i = 0; i < Language.NAMES.length; i++) {
+            menu.getMenu()
+                    .add(1, i, i, Language.NAMES[i])
+                    .setCheckable(true)
+                    .setChecked(i == current);
+        }
+        menu.getMenu().setGroupCheckable(1, true, true);
+
+        menu.setOnMenuItemClickListener(item -> {
+            int which = item.getItemId();
+            if (which != current) {
+                Language.setLanguage(Language.TAGS[which]);
+            }
+            return true;
+        });
+        menu.show();
     }
 
     private void refreshProfile(SessionManager session, Habitation home) {
