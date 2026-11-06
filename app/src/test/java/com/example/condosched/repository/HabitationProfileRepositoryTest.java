@@ -50,10 +50,9 @@ public class HabitationProfileRepositoryTest {
         assertNull(result.error);
         assertNull(result.profile);
         RecordedRequest request = server.takeRequest();
-        assertEquals("/rest/v1/rpc/get_habitation_profile", request.getPath());
-        JsonObject body = JsonParser.parseString(request.getBody().readUtf8()).getAsJsonObject();
-        assertEquals(1, body.get("p_unit_id").getAsLong());
-        assertFalse(body.has("p_full_name"));
+        assertEquals("GET", request.getMethod());
+        assertEquals("/rest/v1/habitation_profiles?unit_id=eq.1", request.getPath());
+        assertEquals(0, request.getBodySize());
     }
 
     @Test
@@ -70,6 +69,7 @@ public class HabitationProfileRepositoryTest {
 
     @Test
     public void concurrentRegistrationUsesProfileReturnedByServer() throws Exception {
+        server.enqueue(new MockResponse().setResponseCode(409));
         server.enqueue(new MockResponse().setBody(PROFILE));
         Result result = new Result();
         service.create(1, "Outro contacto", "outro@example.com", result);
@@ -77,10 +77,17 @@ public class HabitationProfileRepositoryTest {
         assertNull(result.error);
         assertEquals("Contacto existente", result.profile.getFullName());
         RecordedRequest request = server.takeRequest();
-        assertEquals("/rest/v1/rpc/create_habitation_profile", request.getPath());
+        assertEquals("POST", request.getMethod());
+        assertEquals("/rest/v1/habitation_profiles", request.getPath());
+        assertEquals("return=representation", request.getHeader("Prefer"));
         JsonObject body = JsonParser.parseString(request.getBody().readUtf8()).getAsJsonObject();
-        assertEquals("Outro contacto", body.get("p_full_name").getAsString());
-        assertEquals("outro@example.com", body.get("p_email").getAsString());
+        assertEquals(1, body.get("unit_id").getAsLong());
+        assertEquals("Outro contacto", body.get("full_name").getAsString());
+        assertEquals("outro@example.com", body.get("email").getAsString());
+        assertFalse(body.has("p_unit_id"));
+        RecordedRequest lookup = server.takeRequest();
+        assertEquals("GET", lookup.getMethod());
+        assertEquals("/rest/v1/habitation_profiles?unit_id=eq.1", lookup.getPath());
     }
 
     @Test

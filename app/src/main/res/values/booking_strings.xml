@@ -37,12 +37,12 @@
     <string name="booking_status_cancelled">Cancelled</string>
     <string name="booking_status_rejected">Rejected</string>
     <string name="booking_status_unknown">Not provided</string>
-    <string name="booking_cancel">Cancel booking</string>
-    <string name="booking_cancel_title">Cancel this booking?</string>
-    <string name="booking_cancel_message">Cancel the booking for %1$s (%2$s)? It will stay in the history and the period will become available.</string>
+    <string name="booking_delete">Delete booking</string>
+    <string name="booking_delete_title">Delete this booking?</string>
+    <string name="booking_delete_message">Delete the booking for %1$s (%2$s)? It will be permanently removed and the period will become available.</string>
     <string name="booking_keep">Keep booking</string>
-    <string name="booking_cancelling">Cancelling booking…</string>
-    <string name="booking_cancelled">Booking cancelled.</string>
-    <string name="booking_cancel_failed">Could not confirm the cancellation. Refresh the list to check its status.</string>
-    <string name="booking_not_found">The booking was not found or can no longer be cancelled. Refresh the list.</string>
+    <string name="booking_deleting">Deleting booking…</string>
+    <string name="booking_deleted">Booking deleted.</string>
+    <string name="booking_delete_failed">Could not confirm the deletion. Refresh the list before trying again.</string>
+    <string name="booking_not_found">The booking was not found. Refresh the list.</string>
 </resources>

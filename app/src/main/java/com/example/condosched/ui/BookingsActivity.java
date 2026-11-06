@@ -27,14 +27,14 @@ public class BookingsActivity extends SessionActivity {
         BottomNavigation.bind(this, R.id.navBookings);
         viewModel = new ViewModelProvider(this).get(BookingsViewModel.class);
         viewModel.getState().observe(this, this::render);
-        viewModel.getCancellation().observe(this, result -> {
+        viewModel.getDeletion().observe(this, result -> {
             render(viewModel.getState().getValue());
             if (result.getStatus() == UiState.Status.SUCCESS) {
-                Toast.makeText(this, R.string.booking_cancelled, Toast.LENGTH_SHORT).show();
-                viewModel.consumeCancellationResult();
+                Toast.makeText(this, R.string.booking_deleted, Toast.LENGTH_SHORT).show();
+                viewModel.consumeDeletionResult();
             } else if (result.getStatus() == UiState.Status.ERROR) {
                 Toast.makeText(this, UiErrors.message(result.getError()), Toast.LENGTH_LONG).show();
-                viewModel.consumeCancellationResult();
+                viewModel.consumeDeletionResult();
             }
         });
         findViewById(R.id.bookingsRefresh).setOnClickListener(v -> viewModel.load(currentSession().getHome().unitId));
@@ -44,31 +44,31 @@ public class BookingsActivity extends SessionActivity {
         boolean loading = result.getStatus() == UiState.Status.LOADING;
         boolean success = result.getStatus() == UiState.Status.SUCCESS;
         boolean empty = success && result.getData().isEmpty();
-        boolean cancelling = viewModel.isCancelling();
-        findViewById(R.id.bookingsRefresh).setEnabled(!loading && !cancelling);
+        boolean deleting = viewModel.isDeleting();
+        findViewById(R.id.bookingsRefresh).setEnabled(!loading && !deleting);
         TextView status = findViewById(R.id.bookingsStatus);
-        status.setVisibility(success && !empty && !cancelling ? View.GONE : View.VISIBLE);
-        if (cancelling) status.setText(R.string.booking_cancelling);
+        status.setVisibility(success && !empty && !deleting ? View.GONE : View.VISIBLE);
+        if (deleting) status.setText(R.string.booking_deleting);
         else if (loading) status.setText(R.string.bookings_loading);
         else if (result.getStatus() == UiState.Status.ERROR) status.setText(UiErrors.message(result.getError()));
         else if (empty) status.setText(R.string.bookings_empty);
         ListView list = findViewById(R.id.bookingsList);
         list.setVisibility(success && !empty ? View.VISIBLE : View.GONE);
-        if (success) list.setAdapter(new BookingAdapter(this, result.getData(), cancelling, this::confirmCancellation));
+        if (success) list.setAdapter(new BookingAdapter(this, result.getData(), deleting, this::confirmDeletion));
     }
 
-    private void confirmCancellation(Booking booking) {
-        if (viewModel.isCancelling()) return;
+    private void confirmDeletion(Booking booking) {
+        if (viewModel.isDeleting()) return;
         String name = booking.getAmenityName();
         if (name == null || name.trim().isEmpty()) name = getString(R.string.amenity_unnamed);
         String period = getString(R.string.booking_period,
                 BookingDisplay.dateTime(this, booking.getStartTime()), BookingDisplay.dateTime(this, booking.getEndTime()));
         new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.booking_cancel_title)
-                .setMessage(getString(R.string.booking_cancel_message, name, period))
+                .setTitle(R.string.booking_delete_title)
+                .setMessage(getString(R.string.booking_delete_message, name, period))
                 .setNegativeButton(R.string.booking_keep, (dialog, which) -> dialog.dismiss())
-                .setPositiveButton(R.string.booking_cancel, (dialog, which) ->
-                        viewModel.cancelBooking(currentSession().getHome().unitId, booking.getId()))
+                .setPositiveButton(R.string.booking_delete, (dialog, which) ->
+                        viewModel.deleteBooking(currentSession().getHome().unitId, booking.getId()))
                 .show();
     }
 

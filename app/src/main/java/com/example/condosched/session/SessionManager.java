@@ -14,6 +14,8 @@ public final class SessionManager {
     public boolean hasSession() {
         return preferences.getBoolean("serverProfile", false)
                 && preferences.getLong("unitId", 0) > 0
+                && preferences.getLong("condominiumId", 0) > 0
+                && preferences.getLong("buildingId", 0) > 0
                 && !getName().isEmpty() && !getEmail().isEmpty();
     }
 

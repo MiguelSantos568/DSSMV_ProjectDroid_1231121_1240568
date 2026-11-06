@@ -1,93 +1,71 @@
-# Acesso por QR, registo e sessão
+# QR, registo e sessão
 
-## Utilização
+## Funcionamento
 
-O QR identifica uma habitação da TheCondo. O seu conteúdo tem o formato
-`condosched://unit/ID`, onde `ID` é o identificador da habitação e não o número
-da porta. Existe um exemplo em [qr-unit-1.png](qr-unit-1.png).
+O QR identifica uma habitação da TheCondo, no formato `condosched://unit/ID`.
+O ID é o da habitação, não o número da porta. Exemplo: [qr-unit-1.png](qr-unit-1.png).
 
-1. O utilizador toca em ler QR e a biblioteca ZXing devolve o texto lido.
-2. A app valida o formato e procura a habitação na TheCondo.
-3. Consulta no Supabase o perfil associado ao ID dessa habitação.
-4. Se o perfil existir, guarda a sessão e abre o início.
-5. Se não existir, pede o nome e email de contacto da habitação.
-6. Depois de o servidor devolver o perfil, guarda a sessão e abre o início.
+1. ZXing lê o QR e devolve o texto à `AccessActivity`.
+2. `AccessViewModel` usa `HabitationQr` para validar o texto e obter o ID.
+3. `HabitationRepository` consulta a TheCondo e encontra a casa.
+4. `HabitationProfileRepository` consulta o contacto dessa casa no Supabase.
+5. Se existir, guarda a sessão e abre o início; se faltar, abre o registo.
+6. `RegisterViewModel` valida nome/email e pede ao Repository para guardar o perfil.
 
-Uma falha de rede apresenta um erro; não é tratada como ausência de perfil.
+Falha de rede e ausência de perfil são resultados diferentes: uma falha não abre
+um registo novo. As Activities observam LiveData e apresentam os resultados.
 
-## Ficheiros e responsabilidades
+## Ficheiros principais
 
 | Ficheiro | Função |
 | --- | --- |
-| `ui/AccessActivity` | Abrir o leitor e apresentar o resultado do acesso |
-| `viewmodel/AccessViewModel` | Coordenar a validação do QR, procura da casa e consulta do perfil |
-| `domain/HabitationQr` | Validar o texto e extrair o ID |
-| `repository/HabitationRepository` | Consultar os condomínios e encontrar a habitação |
-| `repository/HabitationMapper` | Converter a hierarquia da API em `Habitation` |
-| `domain/Habitation` | Juntar os IDs e nomes do condomínio, prédio e habitação selecionada |
-| `ui/RegisterActivity` | Recolher nome e email |
-| `viewmodel/RegisterViewModel` | Validar o contacto e pedir a criação do perfil |
-| `domain/ProfileContactValidator` | Validar nome e email sem depender da interface |
-| `repository/HabitationProfileRepository` | Consultar e criar o perfil no Supabase |
-| `repository/SessionRepository` | Manter a sessão e notificar os observadores |
-| `session/SessionManager` | Ler, gravar e limpar a sessão em SharedPreferences |
+| `AccessActivity`, `AccessViewModel` | Leitura e coordenação do acesso |
+| `HabitationQr` | Validar o formato do QR |
+| `HabitationRepository`, `HabitationMapper` | Consultar a TheCondo e construir `Habitation` |
+| `RegisterActivity`, `RegisterViewModel` | Formulário e registo do contacto |
+| `ProfileContactValidator` | Validar nome e email em Java |
+| `HabitationProfileRepository` | Consultar/criar o perfil e converter o DTO para domínio |
+| `SessionRepository`, `SessionManager` | Sessão observável e persistência local |
+| `SessionViewModel`, `SessionActivity` | Observar a sessão nos ecrãs e tratar a saída |
 
-Na resposta da API, `CondominiumDTO` contém os prédios (`BuildingDTO`) e cada prédio
-contém as habitações (`UnitDTO`). O Mapper encontra o ID lido no QR e cria um único
-`Habitation` com o contexto necessário para os ecrãs. Não é utilizada uma classe
-de domínio `Unit` separada.
+`HabitationMapper` percorre `CondominiumDTO → BuildingDTO → UnitDTO` e reúne os
+IDs e nomes em `Habitation`. `HomeSession` junta essa casa a `HabitationProfile`.
 
-As Activities observam LiveData e navegam quando a operação termina.
-`AccessViewModel.consumeResult()` marca a navegação como tratada para evitar
-repeti-la numa recriação do ecrã.
-
-## Pedidos HTTP
+## Pedidos e dados
 
 | Serviço | Pedido | Resultado |
 | --- | --- | --- |
-| TheCondo | `GET /api/condominiums` | Hierarquia de condomínios, prédios e habitações |
-| Supabase | `POST /rest/v1/rpc/get_habitation_profile` | Perfil da habitação ou lista vazia |
-| Supabase | `POST /rest/v1/rpc/create_habitation_profile` | Perfil criado ou perfil já existente |
+| TheCondo | `GET /api/condominiums` | Hierarquia onde se procura a casa |
+| Supabase | `GET /rest/v1/habitation_profiles?unit_id=eq.ID` | Perfil ou lista vazia |
+| Supabase | `POST /rest/v1/habitation_profiles` | Perfil guardado |
 
-`CondominiumApi` e `HabitationProfileApi` descrevem estes pedidos. Gson converte
-as respostas em DTOs; os Repositories entregam modelos de domínio ao ViewModel.
+`eq.` significa igual a. O POST envia `HabitationProfileDTO`, com `unit_id`,
+`full_name` e `email`, e pede a linha criada com `Prefer: return=representation`.
+A tabela também tem `created_at`, preenchido automaticamente.
 
-## Dados do perfil
+`unit_id` é a chave primária: há um perfil por casa. Se outro dispositivo já o
+registou, o POST recebe HTTP 409; o Repository consulta então o perfil existente.
+Não o substitui. O nome e email são aparados e validados antes da submissão.
 
-A tabela `habitation_profiles` tem `unit_id`, `full_name`, `email` e `created_at`.
-`unit_id` é a chave primária: existe um perfil por habitação. Se dois dispositivos
-registarem a mesma casa, a função de criação devolve o perfil que já existe.
-
-Para preparar o Supabase, executar [habitation_profiles.sql](supabase/habitation_profiles.sql)
-no SQL Editor do projeto configurado em `network/SupabaseConfig`.
-O script ativa RLS, retira o acesso direto à tabela e disponibiliza as duas funções
-utilizadas pela app.
-
-O perfil é partilhado pela habitação. O QR e o email de contacto não constituem
-autenticação individual. As funções recebem o ID da casa, sem verificar a identidade
-da pessoa que o apresenta. Não são criados utilizadores no Supabase Auth.
+O projeto de demonstração usa dados fictícios e acesso público configurado nas
+tabelas. O QR identifica a casa e o email é um contacto; nenhum deles é login.
+A app não chama funções SQL nem cria utilizadores no Supabase Auth.
 
 ## Sessão e perfil
 
-`HomeSession` junta `Habitation` e `HabitationProfile`. O `SessionRepository`
-guarda os dados através de `SessionManager` e expõe a sessão por LiveData.
-Os ecrãs protegidos herdam de `SessionActivity` e observam essa sessão.
+`SessionManager` guarda os IDs, nomes da casa e contacto em SharedPreferences
+com `apply()`. Só `SessionRepository` acede a essa classe e expõe a sessão por
+LiveData. `SessionActivity` volta ao QR quando a sessão termina.
 
-Ao abrir o perfil, `ProfileViewModel` procura o contacto atualizado no servidor.
-Se a rede falhar, mantém a cópia local e apresenta uma mensagem. Se o perfil tiver
-sido removido, a sessão termina. Uma resposta atrasada não reabre uma sessão terminada.
-
-Terminar sessão limpa os dados de sessão do dispositivo, mas não apaga o perfil no Supabase.
-A próxima leitura do mesmo QR volta a consultar esse perfil.
+Ao abrir o perfil, `ProfileViewModel` consulta o contacto atualizado. Se a rede
+falhar, mantém a cópia local e mostra um aviso. Se o perfil tiver sido removido,
+a sessão termina. Uma resposta atrasada não reabre uma sessão terminada.
+Terminar sessão limpa apenas o dispositivo; o contacto continua no Supabase.
 
 ## Verificação manual
 
-- Ler um QR válido e concluir o primeiro registo.
-- Sair e ler o mesmo QR: deve entrar sem repetir o formulário.
-- Usar um segundo dispositivo: deve recuperar o mesmo perfil.
-- Fechar e reabrir a app: deve manter a sessão.
-- Testar QR inválido, habitação inexistente e cancelamento da leitura.
-- Sem internet, tentar um novo acesso: deve apresentar erro.
-- Rodar o ecrã durante uma consulta e verificar que não repete a navegação.
+Testar o primeiro registo, repetir o QR noutro dispositivo, fechar/reabrir a app,
+sair da sessão, recusar a leitura, usar um QR inválido, retirar a Internet e rodar
+o ecrã durante a consulta. A rotação não deve repetir pedidos ou navegação.
 
 [Organização geral](Architecture-guide.md)
