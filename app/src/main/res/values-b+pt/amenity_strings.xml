@@ -13,7 +13,11 @@
   <string name="amenity_unnamed">Espaço comum</string>
   <string name="amenity_hours">Horário: %1$s – %2$s</string>
   <string name="amenity_time_unknown">Não indicado</string>
-  <string name="amenity_capacity">Capacidade: %1$d pessoas</string>
+  <plurals name="amenity_capacity">
+    <item quantity="one">Capacidade: %1$d pessoa</item>
+    <item quantity="many">Capacidade: %1$d pessoas</item>
+    <item quantity="other">Capacidade: %1$d pessoas</item>
+  </plurals>
   <string name="amenity_capacity_unknown">Capacidade não indicada</string>
   <string name="amenity_building_fallback">Prédio %1$d</string>
 </resources>

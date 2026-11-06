@@ -1,121 +1,68 @@
 @startuml
+hide empty methods
 
-'----- Classes -----
-
-class "Document"{
-    - id: long
-    - title: String
-    - description: String
-    - documentType: String
-    - fileName: String
-    - filePath: String
-    - mimeType: String
-    - fileSize: long
-    - unitId: long
-    - maintenanceRequestId: long
-    - maintenanceInterventionId: long
-    - isPublic: boolean
-    - publishedDate: String
+package "Modelos dos ecrãs" {
+    class Habitation {
+        unitId: long
+        condominiumId: long
+        buildingId: long
+        condominium: String
+        building: String
+        floor: String
+        unit: String
+    }
+    class HabitationProfile {
+        unitId: long
+        fullName: String
+        email: String
+    }
+    class HomeSession {
+        home: Habitation
+        profile: HabitationProfile
+    }
+    class Amenity {
+        id: long
+        name: String
+        description: String
+        type: String
+        buildingId: long
+        buildingName: String
+        requiresBooking: boolean
+        capacity: int
+        openingTime: LocalTime
+        closingTime: LocalTime
+        bookingFee: Double
+        isActive: boolean
+        rules: String
+    }
+    class Resident {
+        id: long
+        unitId: long
+        firstName: String
+        lastName: String
+        isActive: boolean
+    }
+    class Booking {
+        id: long
+        unitId: long
+        amenityId: long
+        amenityName: String
+        residentId: long
+        startTime: String
+        endTime: String
+        status: String
+        numberOfGuests: int
+        fee: Double
+        notes: String
+        canCancel(): boolean
+    }
 }
 
-class "Condominium"{
-    - id: long
-    - name: String
-    - buildings: Building
-}
-
-class "Coordinates"{
-    - latitude: double
-    - longitude: double
-}
-
-class "Amenity"{
-    - id: long
-    - name: String
-    - description: String
-    - type: String
-    - buildingId: long
-    - buildingName: String
-    - requiresBooking: boolean
-    - capacity: int
-    - openingTime: LocalTime
-    - closingTime: LocalTime
-    - bookingFee: Double
-    - isActive: boolean
-    - rules: String
-}
-
-class "Booking"{
-    - id: long
-    - amenityId: long
-    - residentId: long
-    - startTime: String
-    - endTime: String
-    - status: String
-    - numberOfGuests: int
-    - fee: int
-    - notes: String
-}
-
-class "Building"{
-    - id: long
-    - name: String
-    - condominiumId: long
-}
-
-class "Resident"{
-    - id: long
-    - firstName: String
-    - lastName: String
-    - email: String
-    - phone: String
-    - documentNumber: String
-    - unitId: long
-    - residentType: String
-    - moveInDate: String
-    - moveOutDate: String
-    - isActive: boolean
-}
-
-class "Unit"{
-    - id: long
-    - unitNumber: String
-    - buildingId: long
-    - floor: int
-    - type: String
-    - area: int
-    - bedrooms: int
-    - bathrooms: int
-    - status: String
-    - monthlyFee: int
-    - permillage: int
-}
-
-class "LocalTime" <<java.time>>
-
-class "Event"{
-    - name: String
-    - BookingId: long
-    - startDate: String
-    - endDate: String
-    +toBooking()
-}
-
-'----- Connections -----
-
-"Coordinates" -right. "Condominium"
-"LocalTime" -. "Amenity"
-
-"Building" "1..*"--"1" "Condominium" : "contains"
-"Amenity" "1..*"--"1" "Building" : "contains"
-"Unit" "1..*"-left-"1" "Building" : "contains"
-"Resident" "1"--"1" "Unit" : "is inhabited"
-"Booking" "1..*"-right-"1" "Resident" : "books"
-"Booking" "1..*"-left-"1" "Amenity" : "provides\nlocation"
-
-"Booking" -up-|> "Event" : "expands"
-
-"Amenity" -left.> "Document" : photo
-"Event" -left.> "Document" : photo
+HomeSession *-- Habitation
+HomeSession *-- HabitationProfile
+Booking ..> Habitation : unitId
+Booking ..> Amenity : amenityId
+Booking ..> Resident : residentId
+Resident ..> Habitation : unitId
 
 @enduml

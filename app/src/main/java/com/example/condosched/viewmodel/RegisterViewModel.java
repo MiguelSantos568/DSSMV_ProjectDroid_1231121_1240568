@@ -28,13 +28,17 @@ public class RegisterViewModel extends AndroidViewModel {
 
     public void submit(Habitation home, String name, String email) {
         if (state.getValue().getStatus() == UiState.Status.LOADING) return;
-        String fullName = name.trim();
-        String address = email.trim();
-        DataError invalid = ProfileContactValidator.validate(fullName, address);
+        DataError invalid = ProfileContactValidator.validate(name, email);
         if (invalid != null) {
             state.setValue(UiState.failure(invalid, null));
             return;
         }
+        if (home == null || home.unitId <= 0) {
+            state.setValue(UiState.failure(DataError.HOME_UNAVAILABLE, null));
+            return;
+        }
+        String fullName = name.trim();
+        String address = email.trim();
         state.setValue(UiState.loading(null));
         profiles.create(home.unitId, fullName, address, new RepositoryCallback<HabitationProfile>() {
             @Override

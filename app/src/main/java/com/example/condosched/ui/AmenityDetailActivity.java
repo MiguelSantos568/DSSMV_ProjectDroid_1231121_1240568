@@ -36,7 +36,7 @@ public class AmenityDetailActivity extends SessionActivity {
                 AmenityDisplay.time(this, amenity.getOpeningTime()),
                 AmenityDisplay.time(this, amenity.getClosingTime())));
         text(R.id.detailCapacity, amenity.getCapacity() > 0
-                ? getString(R.string.amenity_capacity, amenity.getCapacity())
+                ? getResources().getQuantityString(R.plurals.amenity_capacity, amenity.getCapacity(), amenity.getCapacity())
                 : getString(R.string.amenity_capacity_unknown));
         text(R.id.detailBooking, getString(amenity.isRequiresBooking()
                 ? R.string.needs_booking : R.string.free_access));

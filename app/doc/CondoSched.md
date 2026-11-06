@@ -1,9 +1,9 @@
-# CondoShed
+# CondoSched — proposta inicial
 
 ---
 
 ### Icon:
-![image info](./app/src/main/res/mipmap-hdpi/ic_launcher.png)
+![Ícone da aplicação](../src/main/res/mipmap-hdpi/ic_launcher.png)
 
 ---
 

@@ -1,7 +1,5 @@
 package com.example.condosched.dto;
 
-
-
 public class AmenityDTO {
 
     private long id;

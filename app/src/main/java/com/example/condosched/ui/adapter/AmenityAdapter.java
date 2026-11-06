@@ -46,7 +46,7 @@ public final class AmenityAdapter extends ArrayAdapter<Amenity> {
                 R.string.amenity_hours, AmenityDisplay.time(getContext(), amenity.getOpeningTime()),
                 AmenityDisplay.time(getContext(), amenity.getClosingTime())));
         ((TextView) row.findViewById(R.id.amenityCapacity)).setText(amenity.getCapacity() > 0
-                ? getContext().getString(R.string.amenity_capacity, amenity.getCapacity())
+                ? getContext().getResources().getQuantityString(R.plurals.amenity_capacity, amenity.getCapacity(), amenity.getCapacity())
                 : getContext().getString(R.string.amenity_capacity_unknown));
         ((TextView) row.findViewById(R.id.amenityBooking)).setText(amenity.isRequiresBooking()
                 ? R.string.needs_booking : R.string.free_access);

@@ -107,14 +107,28 @@ exception
 end;
 $$;
 
+create or replace function public.cancel_booking(p_unit_id bigint, p_booking_id bigint)
+returns setof public.bookings
+language sql volatile security definer
+set search_path = ''
+as $$
+    update public.bookings
+    set status = 'cancelled'
+    where id = p_booking_id and unit_id = p_unit_id
+      and status in ('confirmed', 'pending', 'cancelled')
+    returning *;
+$$;
+
 -- Modelo do protótipo: o ID da casa do QR é usado para consultar as suas reservas.
 -- Estas funções não constituem autenticação individual de residentes.
 revoke all on function public.get_home_bookings(bigint) from public;
 revoke all on function public.get_amenity_bookings(bigint) from public;
 revoke all on function public.create_booking(jsonb) from public;
+revoke all on function public.cancel_booking(bigint, bigint) from public;
 grant execute on function public.get_home_bookings(bigint) to anon, authenticated;
 grant execute on function public.get_amenity_bookings(bigint) to anon, authenticated;
 grant execute on function public.create_booking(jsonb) to anon, authenticated;
+grant execute on function public.cancel_booking(bigint, bigint) to anon, authenticated;
 
 notify pgrst, 'reload schema';
 commit;

@@ -289,6 +289,91 @@ public class BookingRepositoryTest {
         assertFalse(result.latch.await(600, TimeUnit.MILLISECONDS));
     }
 
+    @Test
+    public void cancellationUpdatesOnlySupabaseAndIncludesHomeAndBookingIds() throws Exception {
+        enqueue(supabase, "[" + booking(25, 1, 9, start.toString(), end.toString(), "cancelled") + "]");
+        Result<Booking> result = new Result<>();
+        repository.cancelBooking(1, 25, result);
+        result.await();
+        assertNull(result.error);
+        assertEquals("cancelled", result.data.getStatus());
+        assertFalse(result.data.canCancel());
+        assertEquals(0, condo.getRequestCount());
+        RecordedRequest request = supabase.takeRequest();
+        assertEquals("POST", request.getMethod());
+        assertEquals("/rest/v1/rpc/cancel_booking", request.getPath());
+        JsonObject body = JsonParser.parseString(request.getBody().readUtf8()).getAsJsonObject();
+        assertEquals(1, body.get("p_unit_id").getAsLong());
+        assertEquals(25, body.get("p_booking_id").getAsLong());
+    }
+
+    @Test
+    public void cancellationCannotAcceptAResponseFromAnotherHome() throws Exception {
+        enqueue(supabase, "[" + booking(25, 2, 9, start.toString(), end.toString(), "cancelled") + "]");
+        Result<Booking> result = new Result<>();
+        repository.cancelBooking(1, 25, result);
+        result.await();
+        assertEquals(DataError.BOOKING_CANCEL_FAILED, result.error);
+    }
+
+    @Test
+    public void emptyCancellationResponseMeansBookingNotFound() throws Exception {
+        enqueue(supabase, "[]");
+        Result<Booking> result = new Result<>();
+        repository.cancelBooking(1, 25, result);
+        result.await();
+        assertEquals(DataError.NOT_FOUND, result.error);
+    }
+
+    @Test
+    public void cancellationFailureDoesNotBecomeSuccess() throws Exception {
+        supabase.enqueue(new MockResponse().setResponseCode(503));
+        Result<Booking> result = new Result<>();
+        repository.cancelBooking(1, 25, result);
+        result.await();
+        assertEquals(DataError.BOOKING_CANCEL_FAILED, result.error);
+        assertNull(result.data);
+        assertEquals(0, condo.getRequestCount());
+    }
+
+    @Test
+    public void missingCancellationFunctionIsReportedAsUnavailable() throws Exception {
+        supabase.enqueue(new MockResponse().setResponseCode(404));
+        Result<Booking> result = new Result<>();
+        repository.cancelBooking(1, 25, result);
+        result.await();
+        assertEquals(DataError.BOOKING_SERVICE_UNAVAILABLE, result.error);
+    }
+
+    @Test
+    public void malformedDatesInHomeListAreRejectedBeforePresentation() throws Exception {
+        enqueue(supabase, "[" + booking(1, 1, 9, "invalid", end.toString(), "confirmed") + "]");
+        Result<List<Booking>> result = new Result<>();
+        repository.loadForHome(1, result);
+        result.await();
+        assertEquals(DataError.INVALID_RESPONSE, result.error);
+        assertEquals(0, condo.getRequestCount());
+    }
+
+    @Test
+    public void invalidGuestCountInHomeListIsRejected() throws Exception {
+        enqueue(supabase, "[" + booking(1, 1, 9, start.toString(), end.toString(), "confirmed")
+                .replace("\"number_of_people\":2", "\"number_of_people\":0") + "]");
+        Result<List<Booking>> result = new Result<>();
+        repository.loadForHome(1, result);
+        result.await();
+        assertEquals(DataError.INVALID_RESPONSE, result.error);
+    }
+
+    @Test
+    public void invalidCancellationResponseCannotUpdateTheLocalBooking() throws Exception {
+        enqueue(supabase, "[" + booking(25, 1, 9, end.toString(), start.toString(), "cancelled") + "]");
+        Result<Booking> result = new Result<>();
+        repository.cancelBooking(1, 25, result);
+        result.await();
+        assertEquals(DataError.BOOKING_CANCEL_FAILED, result.error);
+    }
+
     private static class Result<T> implements RepositoryCallback<T> {
         final CountDownLatch latch = new CountDownLatch(1);
         T data;

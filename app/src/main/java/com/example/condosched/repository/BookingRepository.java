@@ -8,6 +8,7 @@ import com.example.condosched.domain.Resident;
 import com.example.condosched.dto.AmenityDTO;
 import com.example.condosched.dto.BookingDTO;
 import com.example.condosched.dto.BookingRequestDTO;
+import com.example.condosched.dto.CancelBookingRequestDTO;
 import com.example.condosched.dto.ResidentDTO;
 import com.example.condosched.network.ApiClient;
 import com.example.condosched.network.BookingApi;
@@ -25,6 +26,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/** Consulta regras e residentes na TheCondo; guarda e consulta marcações no Supabase. */
 public class BookingRepository {
     private final BookingApi bookingApi;
     private final AmenityApi amenityApi;
@@ -168,8 +170,7 @@ public class BookingRepository {
                     return;
                 }
                 BookingDTO result = data.get(0);
-                if (result.getId() == null || result.getId() <= 0
-                        || result.getUnitId() != request.getUnitId()
+                if (!isValidBooking(result, request.getUnitId())
                         || result.getAmenityId() != request.getAmenityId()
                         || result.getResidentId() != request.getResidentId()
                         || result.getNumberOfGuests() != request.getNumberOfGuests()
@@ -199,6 +200,39 @@ public class BookingRepository {
         });
     }
 
+    public void cancelBooking(long unitId, long bookingId, RepositoryCallback<Booking> callback) {
+        cancel();
+        if (unitId <= 0 || bookingId <= 0) {
+            callback.onError(DataError.NOT_FOUND);
+            return;
+        }
+        CancelBookingRequestDTO request = new CancelBookingRequestDTO();
+        request.setUnitId(unitId);
+        request.setBookingId(bookingId);
+        execute(bookingApi.cancelBooking(request), version, new RepositoryCallback<List<BookingDTO>>() {
+            @Override
+            public void onSuccess(List<BookingDTO> data) {
+                if (data.isEmpty()) {
+                    callback.onError(DataError.NOT_FOUND);
+                    return;
+                }
+                BookingDTO result = data.get(0);
+                if (data.size() != 1 || !isValidBooking(result, unitId)
+                        || result.getId() != bookingId || !"cancelled".equalsIgnoreCase(result.getStatus())) {
+                    callback.onError(DataError.BOOKING_CANCEL_FAILED);
+                    return;
+                }
+                callback.onSuccess(BookingMapper.toDomain(result));
+            }
+
+            @Override
+            public void onError(DataError error) {
+                callback.onError(error == DataError.BOOKING_SERVICE_UNAVAILABLE
+                        ? error : DataError.BOOKING_CANCEL_FAILED);
+            }
+        });
+    }
+
     public void loadForHome(long unitId, RepositoryCallback<List<Booking>> callback) {
         cancel();
         int operation = version;
@@ -211,8 +245,7 @@ public class BookingRepository {
             public void onSuccess(List<BookingDTO> data) {
                 List<Booking> bookings = new ArrayList<>();
                 for (BookingDTO dto : data) {
-                    if (dto == null || dto.getUnitId() != unitId || dto.getId() == null || dto.getId() <= 0
-                            || dto.getStartTime() == null || dto.getEndTime() == null) {
+                    if (!isValidBooking(dto, unitId)) {
                         callback.onError(DataError.INVALID_RESPONSE);
                         return;
                     }
@@ -253,6 +286,21 @@ public class BookingRepository {
         });
     }
 
+    private boolean isValidBooking(BookingDTO booking, long unitId) {
+        if (booking == null || booking.getId() == null || booking.getId() <= 0
+                || booking.getUnitId() != unitId || booking.getAmenityId() <= 0
+                || booking.getResidentId() <= 0 || booking.getNumberOfGuests() <= 0
+                || booking.getStatus() == null || booking.getStatus().trim().isEmpty()
+                || booking.getStartTime() == null || booking.getEndTime() == null) return false;
+        Double fee = booking.getFee();
+        if (fee != null && (!Double.isFinite(fee) || fee < 0)) return false;
+        try {
+            return LocalDateTime.parse(booking.getEndTime()).isAfter(LocalDateTime.parse(booking.getStartTime()));
+        } catch (DateTimeParseException error) {
+            return false;
+        }
+    }
+
     private <T> void execute(Call<T> call, int operation, RepositoryCallback<T> callback) {
         activeRequest = call;
         call.enqueue(new Callback<T>() {
@@ -277,6 +325,7 @@ public class BookingRepository {
         });
     }
 
+    // Interrompe o pedido HTTP ao sair do ecrã; não cancela uma marcação guardada.
     public void cancel() {
         version++;
         if (activeRequest != null) activeRequest.cancel();

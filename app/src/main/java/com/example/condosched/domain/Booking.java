@@ -89,6 +89,10 @@ public class Booking {
         return status;
     }
 
+    public boolean canCancel() {
+        return "confirmed".equalsIgnoreCase(status) || "pending".equalsIgnoreCase(status);
+    }
+
     public void setStatus(String status) {
         this.status = status;
     }

@@ -34,54 +34,71 @@ public class BookingDTO {
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
+
     public long getAmenityId() {
         return amenityId;
     }
+
     public void setAmenityId(long amenityId) {
         this.amenityId = amenityId;
     }
+
     public long getResidentId() {
         return residentId;
     }
+
     public void setResidentId(long residentId) {
         this.residentId = residentId;
     }
+
     public String getStartTime() {
         return startTime;
     }
+
     public void setStartTime(String startTime) {
         this.startTime = startTime;
     }
+
     public String getEndTime() {
         return endTime;
     }
+
     public void setEndTime(String endTime) {
         this.endTime = endTime;
     }
+
     public String getStatus() {
         return status;
     }
+
     public void setStatus(String status) {
         this.status = status;
     }
+
     public int getNumberOfGuests() {
         return numberOfGuests;
     }
+
     public void setNumberOfGuests(int numberOfGuests) {
         this.numberOfGuests = numberOfGuests;
     }
+
     public Double getFee() {
         return fee;
     }
+
     public void setFee(Double fee) {
         this.fee = fee;
     }
+
     public String getNotes() {
         return notes;
     }
+
     public void setNotes(String notes) {
         this.notes = notes;
     }

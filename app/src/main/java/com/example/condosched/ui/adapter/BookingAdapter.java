@@ -12,8 +12,17 @@ import com.example.condosched.ui.display.BookingDisplay;
 import java.util.List;
 
 public class BookingAdapter extends ArrayAdapter<Booking> {
-    public BookingAdapter(Context context, List<Booking> bookings) {
+    public interface CancelListener {
+        void onCancel(Booking booking);
+    }
+
+    private final boolean cancelling;
+    private final CancelListener cancelListener;
+
+    public BookingAdapter(Context context, List<Booking> bookings, boolean cancelling, CancelListener cancelListener) {
         super(context, R.layout.item_booking, bookings);
+        this.cancelling = cancelling;
+        this.cancelListener = cancelListener;
     }
 
     @Override
@@ -27,6 +36,10 @@ public class BookingAdapter extends ArrayAdapter<Booking> {
         ((TextView) row.findViewById(R.id.bookingRowPeriod)).setText(getContext().getString(R.string.booking_period,
                 BookingDisplay.dateTime(getContext(), booking.getStartTime()), BookingDisplay.dateTime(getContext(), booking.getEndTime())));
         ((TextView) row.findViewById(R.id.bookingRowStatus)).setText(BookingDisplay.status(getContext(), booking.getStatus()));
+        View cancel = row.findViewById(R.id.bookingRowCancel);
+        cancel.setVisibility(booking.canCancel() ? View.VISIBLE : View.GONE);
+        cancel.setEnabled(!cancelling);
+        cancel.setOnClickListener(view -> cancelListener.onCancel(booking));
         return row;
     }
 }

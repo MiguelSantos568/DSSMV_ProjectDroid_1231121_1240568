@@ -3,7 +3,11 @@
   <string name="home_label">A TUA CASA</string>
   <string name="credits_body">Conhece a equipa por trás da CondoSched.</string>
   <string name="open_menu">Abrir menu</string>
-  <string name="amenities_count">%1$d espaços para descobrir</string>
+  <plurals name="amenities_count">
+    <item quantity="one">%1$d espaço para descobrir</item>
+    <item quantity="many">%1$d espaços para descobrir</item>
+    <item quantity="other">%1$d espaços para descobrir</item>
+  </plurals>
   <string name="qr_eyebrow">BEM-VINDO A CASA</string>
   <string name="nav_home">Início</string>
   <string name="welcome_title">Sente-te em casa.</string>
@@ -15,7 +19,7 @@
   <string name="profile_title">Um lugar para chamar teu.</string>
   <string name="home_details">Dados da habitação</string>
   <string name="qr_title">A tua casa começa aqui.</string>
-  <string name="qr_body">Ler o QR da tua habitação para descobrir o teu coondomínio.</string>
+  <string name="qr_body">Lê o QR da tua habitação para descobrir o teu condomínio.</string>
   <string name="floor_label">Andar</string>
   <string name="profile_body">A mesma casa. Um perfil partilhado.</string>
   <string name="nav_bookings">Reservas</string>

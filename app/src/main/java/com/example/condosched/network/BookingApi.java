@@ -2,6 +2,7 @@ package com.example.condosched.network;
 
 import com.example.condosched.dto.BookingDTO;
 import com.example.condosched.dto.BookingRequestDTO;
+import com.example.condosched.dto.CancelBookingRequestDTO;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -18,4 +19,7 @@ public interface BookingApi {
 
     @POST("rpc/create_booking")
     Call<List<BookingDTO>> create(@Body BookingRequestDTO request);
+
+    @POST("rpc/cancel_booking")
+    Call<List<BookingDTO>> cancelBooking(@Body CancelBookingRequestDTO request);
 }

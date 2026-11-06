@@ -53,7 +53,9 @@ public final class BookingValidator {
 
     public static DataError validateAvailability(long amenityId, LocalDateTime start,
                                                  LocalDateTime end, List<Booking> bookings) {
+        if (bookings == null) return DataError.INVALID_RESPONSE;
         for (Booking booking : bookings) {
+            if (booking == null) return DataError.INVALID_RESPONSE;
             if (booking.getAmenityId() != amenityId || isInactive(booking.getStatus())) continue;
             if (booking.getStartTime() == null || booking.getEndTime() == null) {
                 return DataError.INVALID_RESPONSE;
