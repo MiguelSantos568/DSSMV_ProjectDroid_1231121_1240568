@@ -13,7 +13,7 @@ import java.util.List;
 public class BookingsViewModel extends ViewModel {
     private final BookingRepository repository;
     private final MutableLiveData<UiState<List<Booking>>> state = new MutableLiveData<>(UiState.idle());
-    private final MutableLiveData<UiState<Booking>> cancellation = new MutableLiveData<>(UiState.idle());
+    private final MutableLiveData<UiState<Long>> deletion = new MutableLiveData<>(UiState.idle());
 
     public BookingsViewModel() {
         this(new BookingRepository());
@@ -27,16 +27,16 @@ public class BookingsViewModel extends ViewModel {
         return state;
     }
 
-    public LiveData<UiState<Booking>> getCancellation() {
-        return cancellation;
+    public LiveData<UiState<Long>> getDeletion() {
+        return deletion;
     }
 
-    public boolean isCancelling() {
-        return cancellation.getValue().getStatus() == UiState.Status.LOADING;
+    public boolean isDeleting() {
+        return deletion.getValue().getStatus() == UiState.Status.LOADING;
     }
 
     public void load(long unitId) {
-        if (state.getValue().getStatus() == UiState.Status.LOADING || isCancelling()) return;
+        if (state.getValue().getStatus() == UiState.Status.LOADING || isDeleting()) return;
         state.setValue(UiState.loading(null));
         repository.loadForHome(unitId, new RepositoryCallback<List<Booking>>() {
             @Override
@@ -51,37 +51,33 @@ public class BookingsViewModel extends ViewModel {
         });
     }
 
-    public void cancelBooking(long unitId, long bookingId) {
-        if (state.getValue().getStatus() != UiState.Status.SUCCESS || isCancelling()) return;
+    public void deleteBooking(long unitId, long bookingId) {
+        if (state.getValue().getStatus() != UiState.Status.SUCCESS || isDeleting()) return;
         List<Booking> bookings = state.getValue().getData();
         Booking selected = null;
         for (Booking booking : bookings) {
             if (booking.getId() == bookingId && booking.getUnitId() == unitId) selected = booking;
         }
-        if (selected == null || !selected.canCancel()) return;
-        String amenityName = selected.getAmenityName();
-        cancellation.setValue(UiState.loading(selected));
-        repository.cancelBooking(unitId, bookingId, new RepositoryCallback<Booking>() {
+        if (selected == null) return;
+        deletion.setValue(UiState.loading(bookingId));
+        repository.deleteBooking(unitId, bookingId, new RepositoryCallback<Long>() {
             @Override
-            public void onSuccess(Booking cancelled) {
-                cancelled.setAmenityName(amenityName);
+            public void onSuccess(Long deletedId) {
                 List<Booking> updated = new ArrayList<>(bookings);
-                for (int index = 0; index < updated.size(); index++) {
-                    if (updated.get(index).getId() == bookingId) updated.set(index, cancelled);
-                }
+                updated.removeIf(booking -> booking.getId() == deletedId);
                 state.setValue(UiState.success(updated));
-                cancellation.setValue(UiState.success(cancelled));
+                deletion.setValue(UiState.success(deletedId));
             }
 
             @Override
             public void onError(DataError error) {
-                cancellation.setValue(UiState.failure(error, null));
+                deletion.setValue(UiState.failure(error, null));
             }
         });
     }
 
-    public void consumeCancellationResult() {
-        if (!isCancelling()) cancellation.setValue(UiState.idle());
+    public void consumeDeletionResult() {
+        if (!isDeleting()) deletion.setValue(UiState.idle());
     }
 
     @Override

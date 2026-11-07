@@ -1,154 +1,111 @@
 # Organização da CondoSched
 
-Aplicação Android em Java, compatível com API 26 ou superior. O acesso começa em
-`AccessActivity`, através do QR de uma habitação.
+Aplicação Android em Java, API 26+. O ponto de entrada é `ui/AccessActivity`.
 
-## Estrutura do código
+## Pastas e responsabilidades
 
-Todos os packages estão em `app/src/main/java/com/example/condosched`.
+Os packages estão em `app/src/main/java/com/example/condosched`.
 
-| Pasta | Responsabilidade |
+| Pasta | O que contém |
 | --- | --- |
-| `ui` | Activities, navegação, interação com o utilizador e permissões do dispositivo |
-| `ui/adapter` | Transformar listas de objetos de domínio em linhas dos ecrãs |
-| `ui/display` | Formatar datas, horas, taxas e estados; escolher ícones |
-| `viewmodel` | Coordenar ações e manter o estado dos ecrãs em LiveData |
-| `repository` | Consultar/gravar dados, tratar respostas e converter DTOs para domínio |
-| `network` | Interfaces Retrofit, clientes HTTP e configuração dos servidores |
-| `dto` | Objetos correspondentes aos pedidos e respostas JSON |
-| `domain` | Modelos da aplicação, validações e códigos de erro |
-| `session` | Guardar e ler a sessão local através de SharedPreferences |
+| `ui` | Activities, navegação, interação e permissões do dispositivo |
+| `ui/adapter` | Adapters que apresentam os objetos nas listas |
+| `ui/display` | Formatação de datas, horas, taxas, estados e ícones |
+| `viewmodel` | Coordenação e estado dos ecrãs através de ViewModel e LiveData |
+| `repository` | Consultas, gravação, tratamento de respostas e conversão de DTOs |
+| `network` | Interfaces Retrofit, clientes HTTP e configuração |
+| `dto` | Contratos JSON: construtor vazio, getters/setters e anotações |
+| `domain` | Modelos da app, validações e códigos de erro |
+| `session` | Leitura e gravação da sessão em SharedPreferences |
 
-Os layouts estão em `app/src/main/res/layout`: `activity_...` para ecrãs,
-`item_...` para linhas de listas e `layout_...` para componentes partilhados.
-Os textos estão em `values` e `values-b+pt`. Cores, estilos e dimensões são
-partilhados através dos recursos.
+Layouts em `res/layout`: `activity_...` para ecrãs, `item_...` para linhas e
+`layout_...` para componentes partilhados. Textos em inglês (`values`) e português
+(`values-b+pt`); estilos, cores e dimensões são recursos partilhados.
 
-Para estudar o funcionamento atual, seguir os modelos de `domain`: `Habitation`,
-`HabitationProfile`, `HomeSession`, `Amenity`, `Resident` e `Booking`.
-As classes e os testes do desenho inicial sem utilização foram removidos.
-O [diagrama do domínio](DomainModel.puml) representa os modelos que permanecem.
+## Relação com as teóricas
 
-## Habitação e dados da API
-
-`Habitation` é o modelo usado pela sessão e pelos ecrãs. É imutável: os campos são
-`final` e recebem os valores no construtor. Implementa Serializable para poder ser
-enviado num Intent, por exemplo do acesso por QR para o formulário de registo.
-
-| Dados de `Habitation` | Origem |
+| Aula | Conceitos utilizados |
 | --- | --- |
-| `unitId`, `floor`, `unit` | `UnitDTO`: ID, andar e número da porta |
-| `buildingId`, `building` | `BuildingDTO`: ID e nome do prédio |
-| `condominiumId`, `condominium` | `CondominiumDTO`: ID e nome do condomínio |
+| T3 | Activities, Manifest, Context, layouts XML e listeners |
+| T4 | Intents/extras, Activity Result API, SharedPreferences, adapters e threads |
+| T5, slides 34–37 | DTOs sem regras de negócio e conversão DTO → domínio |
+| T6, slides 5–7 e 16–23 | MVVM, Repository, ViewModel e LiveData |
+| T6, slides 42–51 | Retrofit, interfaces HTTP, Gson e `enqueue()` |
 
-`HabitationMapper` percorre a hierarquia recebida da TheCondo e junta esses dados
-num objeto `Habitation`. Por isso não existem modelos de domínio separados para
-`Unit`, `Building` e `Condominium`; os DTOs correspondentes continuam necessários.
-`HabitationProfile` guarda o contacto da casa e `HomeSession` junta esse perfil
-à habitação. As marcações usam `Habitation.unitId` como referência à casa.
+MVVM significa Model–View–ViewModel. A Activity apresenta os dados e recebe os
+cliques; o ViewModel coordena o ecrã; o Repository trata o acesso aos dados.
+Na T6, «UI controller» refere-se à Activity/Fragment que observa LiveData.
+A SchoolApplication usa uma organização MVC de consola com Controller explícito;
+a CondoSched segue a organização Android MVVM da T6.
 
-## Percurso dos dados
+Os exemplos foram adaptados: as reservas ficam no Supabase em vez de Room, e os
+Repositories HTTP devolvem resultados por callback. O ViewModel atualiza LiveData
+para a Activity observar. `enqueue()` com `onResponse`/`onFailure` também aparece
+na T6; não é obrigatório usar RxJava para executar estes pedidos.
+
+## Percurso de uma operação
 
 ```text
-Ação na Activity → ViewModel → Repository → API HTTP
-Resposta JSON → DTO → Mapper → domínio → LiveData → Activity
+Clique na Activity → ViewModel → Repository → interface Retrofit → servidor
+Resposta JSON → DTO → domínio → LiveData no ViewModel → Activity
 ```
 
-A Activity recebe ações e apresenta o resultado. O ViewModel coordena a operação
-e expõe LiveData. O Repository executa os pedidos Retrofit com `enqueue()` e
-converte a resposta para os modelos utilizados pela app.
+As Activities não chamam Retrofit, DTOs ou SessionManager. Os ViewModels não
+mantêm Activities ou Views. Quando precisam de armazenamento local, usam o
+Context da aplicação através de um Repository.
 
-Os DTOs têm construtor vazio, getters e setters. Os Mappers fazem a conversão
-para domínio. Os erros são devolvidos como `DataError`; os textos apresentados
-são escolhidos na interface através dos recursos.
+`RepositoryCallback<T>` entrega sucesso ou um código `DataError`. O tipo `T` é o
+resultado esperado, por exemplo uma lista de comodidades. `UiErrors`, na interface,
+converte o código de erro num texto traduzido.
 
-O `BookingRepository` valida IDs, datas, pessoas, estado e taxa nas respostas
-completas antes de as apresentar ou confirmar uma alteração. `cancelBooking`
-cancela uma marcação no Supabase; `cancel()` apenas interrompe um pedido HTTP
-quando o ecrã deixa de ser necessário.
+`UiState<T>` reúne dados e estado: IDLE, LOADING, SUCCESS ou ERROR. Todos os ecrãs
+com operações usam esse formato. Uma lista vazia é um sucesso sem elementos.
+O estado de eliminação é separado da lista para manter as reservas visíveis se
+um DELETE falhar e impedir uma atualização enquanto se apaga uma reserva.
 
-`UiState` representa uma operação em espera, carregamento, sucesso ou erro.
-`AmenitiesState` distingue também uma lista vazia.
+Os Mappers convertem horários ou estruturas JSON em modelos da app. O contacto
+da habitação tem uma conversão curta, feita diretamente no seu Repository.
 
-## Ecrãs e classes principais
+## Modelos e armazenamento
 
-| Fluxo | Activity | ViewModel | Repository |
-| --- | --- | --- | --- |
-| Leitura do QR | `AccessActivity` | `AccessViewModel` | `HabitationRepository`, `HabitationProfileRepository` |
-| Registo do contacto | `RegisterActivity` | `RegisterViewModel` | `HabitationProfileRepository` |
-| Sessão | `SessionActivity` | `SessionViewModel` | `SessionRepository` |
-| Perfil | `ProfileActivity` | `ProfileViewModel` | `HabitationProfileRepository` |
-| Lista de comodidades | `AmenitiesActivity` | `AmenitiesViewModel` | `AmenityRepository` |
-| Criar marcação | `CreateBookingActivity` | `CreateBookingViewModel` | `BookingRepository` |
-| Lista e cancelamento de marcações | `BookingsActivity` | `BookingsViewModel` | `BookingRepository` |
-| Fotografia | `CameraActivity` | `CameraViewModel` | `PhotoRepository` |
-
-`MainActivity` e `CondominiumActivity` apresentam dados da sessão.
-`AmenityDetailActivity` apresenta a comodidade recebida no Intent.
-`CreditsActivity` apresenta informação estática.
-
-`SessionActivity` é a base dos ecrãs que exigem sessão. Observa a sessão e volta
-para o acesso quando esta termina. `BottomNavigation` liga os separadores e
-`ScreenInsets` ajusta o conteúdo às barras do sistema e ao teclado.
-
-## Servidores e armazenamento
+`Habitation` reúne IDs e nomes da casa, prédio e condomínio. `HabitationMapper`
+percorre `CondominiumDTO → BuildingDTO → UnitDTO` e constrói esse objeto.
+Os DTOs representam a API; não é preciso duplicar toda essa hierarquia no domínio.
+`Habitation` é imutável e Serializable para passar do QR ao registo num Intent.
+`HabitationProfile` contém o contacto e `HomeSession` junta a casa ao contacto.
+Os restantes modelos principais são `Amenity`, `Resident` e `Booking`.
 
 | Local | Dados |
 | --- | --- |
 | TheCondo | Consulta de condomínios, prédios, habitações, comodidades e residentes |
-| Supabase | Perfis de contacto e marcações associadas à habitação |
-| SharedPreferences | Cópia local da habitação e do contacto para manter a sessão |
+| Supabase | Tabelas `habitation_profiles` e `bookings`, por HTTP direto, sem RPC |
+| SharedPreferences | Sessão local, através de SessionRepository → SessionManager |
 | ViewModel | Estado temporário do ecrã, incluindo a fotografia capturada |
 | MediaStore | Fotografias guardadas em `Pictures/CondoSched` |
 
-`ApiClient` cria clientes independentes para TheCondo e Supabase. A chave do
-Supabase só é acrescentada aos pedidos desse serviço. `SupabaseConfig` contém
-os valores de configuração.
-
-`BookingApi` usa o cliente Supabase. As restantes interfaces TheCondo são apenas
-de consulta. A app não cria, altera ou apaga dados no servidor do professor.
-`BookingDTO` representa o JSON da tabela de reservas, com campos como `unit_id`
-e `amenity_id`. `BookingRequestDTO` envolve esse objeto no parâmetro `p_booking`
-da função de criação. O Mapper converte a resposta para o modelo `Booking`.
-`CancelBookingRequestDTO` transporta os IDs da habitação e da marcação para a
-função `cancel_booking`. A Activity confirma a intenção do utilizador; o ViewModel
-coordena o pedido e só atualiza a lista após confirmação do servidor.
-
-A base é preparada com `supabase/habitation_profiles.sql` e depois
-`supabase/bookings.sql`. O bootstrap de reservas é opcional; a ordem e os pedidos
-HTTP estão descritos no [guia de marcações](Bookings.md).
+`ApiClient` separa os dois clientes HTTP; a chave pública Supabase só segue para
+esse serviço. O protótipo usa dados fictícios e acesso sem autenticação individual:
+os filtros por casa organizam os pedidos, mas não são uma proteção entre utilizadores.
 
 ## Ciclo de vida e fotografia
 
-O ViewModel mantém o estado durante a rotação e liberta os pedidos em
-`onCleared()`. Se o processo terminar, a sessão continua em SharedPreferences,
-mas os dados em memória podem ter de ser carregados novamente.
+ViewModelProvider mantém o ViewModel na rotação. `onCleared()` cancela pedidos que
+já não são necessários. Os Repositories ignoram respostas atrasadas de consultas
+canceladas. A sessão persiste em SharedPreferences; uma sessão sem IDs válidos
+regressa ao QR. Se o processo terminar, o estado temporário pode ter de ser recarregado.
 
-A câmara devolve uma miniatura através de `TakePicturePreview`. A Activity trata
-as permissões, o ViewModel mantém a imagem e o `PhotoRepository` grava-a numa
-thread de trabalho. O resultado regressa à thread da interface através de um
-Handler. Em API 26–28 é necessária permissão de escrita; em API 29+ a gravação
-usa MediaStore com `RELATIVE_PATH` e `IS_PENDING`.
+A Activity pede permissões e usa `TakePicturePreview` para obter uma miniatura.
+`CameraViewModel` mantém a imagem e `PhotoRepository` grava-a numa thread de trabalho,
+regressando à thread principal com Handler. API 26–28 pede permissão de escrita;
+API 29+ usa MediaStore com `RELATIVE_PATH` e `IS_PENDING`.
 
-## Guias das funcionalidades
+## Guias e verificação
 
-- [QR, registo e sessão](QR-access.md)
-- [Comodidades e marcações](Bookings.md)
+[QR e sessão](QR-access.md) explica o acesso e o contacto da casa.
+[Marcações](Bookings.md) explica consultas, criação, validação e DELETE.
+O [diagrama](DomainModel.puml) apresenta os modelos atuais; a
+[proposta inicial](CondoSched.md) descreve o âmbito inicialmente pensado.
 
-A proposta inicial está em [CondoSched.md](CondoSched.md) e a equipa em
-[TeamComposition.md](TeamComposition.md).
-
-## Verificação
-
-Os testes estão em `app/src/test/java/com/example/condosched`, organizados em
-`domain`, `repository` e `viewmodel`. Os testes dos Repositories usam MockWebServer
-para verificar pedidos e respostas sem alterar dados dos servidores reais.
-
-Com Gradle instalado:
-
-```text
-gradle :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
-```
-
-A organização utiliza os conceitos de Activities, Intents, SharedPreferences e
-adapters da T4, DTOs da T5 e Repository, ViewModel, LiveData e Retrofit da T6.
+Os testes estão em `app/src/test`, por `domain`, `repository` e `viewmodel`.
+MockWebServer simula pedidos HTTP; os testes locais não usam dados reais.
+Compilar, executar testes e Android Lint não substitui testar os ecrãs num dispositivo.

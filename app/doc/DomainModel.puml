@@ -54,7 +54,6 @@ package "Modelos dos ecrãs" {
         numberOfGuests: int
         fee: Double
         notes: String
-        canCancel(): boolean
     }
 }
 

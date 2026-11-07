@@ -26,61 +26,58 @@ public class BookingsViewModelTest {
     }
 
     @Test
-    public void successfulCancellationKeepsHistoryAndAmenityName() {
+    public void successfulDeletionRemovesBookingFromList() {
         FakeRepository repository = new FakeRepository();
         BookingsViewModel model = new BookingsViewModel(repository);
         model.load(1);
-        model.cancelBooking(1, 25);
-        assertTrue(model.isCancelling());
-        repository.pending.onSuccess(booking("cancelled"));
-        assertFalse(model.isCancelling());
+        model.deleteBooking(1, 25);
+        assertTrue(model.isDeleting());
+        repository.pending.onSuccess(25L);
+        assertFalse(model.isDeleting());
         List<Booking> data = model.getState().getValue().getData();
-        assertEquals(1, data.size());
-        assertEquals("cancelled", data.get(0).getStatus());
-        assertEquals("Sala", data.get(0).getAmenityName());
-        assertFalse(data.get(0).canCancel());
-        assertEquals(UiState.Status.SUCCESS, model.getCancellation().getValue().getStatus());
-        model.consumeCancellationResult();
-        assertEquals(UiState.Status.IDLE, model.getCancellation().getValue().getStatus());
-        assertEquals(1, model.getState().getValue().getData().size());
+        assertTrue(data.isEmpty());
+        assertEquals(UiState.Status.SUCCESS, model.getDeletion().getValue().getStatus());
+        model.consumeDeletionResult();
+        assertEquals(UiState.Status.IDLE, model.getDeletion().getValue().getStatus());
+        assertTrue(model.getState().getValue().getData().isEmpty());
     }
 
     @Test
-    public void failedCancellationDoesNotMarkBookingAsCancelled() {
+    public void failedDeletionKeepsBookingInList() {
         FakeRepository repository = new FakeRepository();
         BookingsViewModel model = new BookingsViewModel(repository);
         model.load(1);
-        model.cancelBooking(1, 25);
-        repository.pending.onError(DataError.BOOKING_CANCEL_FAILED);
+        model.deleteBooking(1, 25);
+        repository.pending.onError(DataError.BOOKING_DELETE_FAILED);
         assertEquals("confirmed", model.getState().getValue().getData().get(0).getStatus());
-        assertEquals(UiState.Status.ERROR, model.getCancellation().getValue().getStatus());
-        assertEquals(DataError.BOOKING_CANCEL_FAILED, model.getCancellation().getValue().getError());
+        assertEquals(UiState.Status.ERROR, model.getDeletion().getValue().getStatus());
+        assertEquals(DataError.BOOKING_DELETE_FAILED, model.getDeletion().getValue().getError());
     }
 
     @Test
-    public void duplicateTapsAndRefreshCannotInterruptCancellation() {
+    public void duplicateTapsAndRefreshCannotInterruptDeletion() {
         FakeRepository repository = new FakeRepository();
         BookingsViewModel model = new BookingsViewModel(repository);
         model.load(1);
-        model.cancelBooking(1, 25);
-        model.cancelBooking(1, 25);
+        model.deleteBooking(1, 25);
+        model.deleteBooking(1, 25);
         model.load(1);
-        assertEquals(1, repository.cancellations);
+        assertEquals(1, repository.deletions);
         assertEquals(1, repository.loads);
     }
 
     @Test
-    public void cancelledOrForeignOrUnknownBookingsCannotBeSubmitted() {
+    public void foreignOrUnknownOrDeletedBookingsCannotBeSubmitted() {
         FakeRepository repository = new FakeRepository();
         BookingsViewModel model = new BookingsViewModel(repository);
         model.load(1);
-        model.cancelBooking(2, 25);
-        model.cancelBooking(1, 99);
-        assertEquals(0, repository.cancellations);
-        model.cancelBooking(1, 25);
-        repository.pending.onSuccess(booking("cancelled"));
-        model.cancelBooking(1, 25);
-        assertEquals(1, repository.cancellations);
+        model.deleteBooking(2, 25);
+        model.deleteBooking(1, 99);
+        assertEquals(0, repository.deletions);
+        model.deleteBooking(1, 25);
+        repository.pending.onSuccess(25L);
+        model.deleteBooking(1, 25);
+        assertEquals(1, repository.deletions);
     }
 
     @Test
@@ -90,16 +87,16 @@ public class BookingsViewModelTest {
         ViewModelStore store = new ViewModelStore();
         store.put("bookings", model);
         model.load(1);
-        model.cancelBooking(1, 25);
+        model.deleteBooking(1, 25);
         store.clear();
         assertTrue(repository.cancelled);
     }
 
     private class FakeRepository extends BookingRepository {
         int loads;
-        int cancellations;
+        int deletions;
         boolean cancelled;
-        RepositoryCallback<Booking> pending;
+        RepositoryCallback<Long> pending;
 
         @Override
         public void loadForHome(long unitId, RepositoryCallback<List<Booking>> callback) {
@@ -108,8 +105,8 @@ public class BookingsViewModelTest {
         }
 
         @Override
-        public void cancelBooking(long unitId, long bookingId, RepositoryCallback<Booking> callback) {
-            cancellations++;
+        public void deleteBooking(long unitId, long bookingId, RepositoryCallback<Long> callback) {
+            deletions++;
             pending = callback;
         }
 

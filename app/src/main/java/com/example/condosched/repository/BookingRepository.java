@@ -7,8 +7,6 @@ import com.example.condosched.domain.DataError;
 import com.example.condosched.domain.Resident;
 import com.example.condosched.dto.AmenityDTO;
 import com.example.condosched.dto.BookingDTO;
-import com.example.condosched.dto.BookingRequestDTO;
-import com.example.condosched.dto.CancelBookingRequestDTO;
 import com.example.condosched.dto.ResidentDTO;
 import com.example.condosched.network.ApiClient;
 import com.example.condosched.network.BookingApi;
@@ -127,7 +125,7 @@ public class BookingRepository {
     private void checkAvailability(long unitId, Amenity amenity, long residentId, LocalDateTime start,
                                    LocalDateTime end, int people, String notes, int operation,
                                    RepositoryCallback<Booking> callback) {
-        execute(bookingApi.getForAmenity(amenity.getId()), operation, new RepositoryCallback<List<BookingDTO>>() {
+        execute(bookingApi.getForAmenity("eq." + amenity.getId()), operation, new RepositoryCallback<List<BookingDTO>>() {
             @Override
             public void onSuccess(List<BookingDTO> bookings) {
                 List<Booking> existingBookings = new ArrayList<>();
@@ -160,9 +158,7 @@ public class BookingRepository {
     }
 
     private void post(BookingDTO request, int operation, RepositoryCallback<Booking> callback) {
-        BookingRequestDTO body = new BookingRequestDTO();
-        body.setBooking(request);
-        execute(bookingApi.create(body), operation, new RepositoryCallback<List<BookingDTO>>() {
+        execute(bookingApi.create(request), operation, new RepositoryCallback<List<BookingDTO>>() {
             @Override
             public void onSuccess(List<BookingDTO> data) {
                 if (data.size() != 1 || data.get(0) == null) {
@@ -200,16 +196,14 @@ public class BookingRepository {
         });
     }
 
-    public void cancelBooking(long unitId, long bookingId, RepositoryCallback<Booking> callback) {
+    public void deleteBooking(long unitId, long bookingId, RepositoryCallback<Long> callback) {
         cancel();
         if (unitId <= 0 || bookingId <= 0) {
             callback.onError(DataError.NOT_FOUND);
             return;
         }
-        CancelBookingRequestDTO request = new CancelBookingRequestDTO();
-        request.setUnitId(unitId);
-        request.setBookingId(bookingId);
-        execute(bookingApi.cancelBooking(request), version, new RepositoryCallback<List<BookingDTO>>() {
+        execute(bookingApi.deleteBooking("eq." + bookingId, "eq." + unitId), version,
+                new RepositoryCallback<List<BookingDTO>>() {
             @Override
             public void onSuccess(List<BookingDTO> data) {
                 if (data.isEmpty()) {
@@ -217,18 +211,18 @@ public class BookingRepository {
                     return;
                 }
                 BookingDTO result = data.get(0);
-                if (data.size() != 1 || !isValidBooking(result, unitId)
-                        || result.getId() != bookingId || !"cancelled".equalsIgnoreCase(result.getStatus())) {
-                    callback.onError(DataError.BOOKING_CANCEL_FAILED);
+                if (data.size() != 1 || result == null || result.getId() == null
+                        || result.getId() != bookingId || result.getUnitId() != unitId) {
+                    callback.onError(DataError.BOOKING_DELETE_FAILED);
                     return;
                 }
-                callback.onSuccess(BookingMapper.toDomain(result));
+                callback.onSuccess(bookingId);
             }
 
             @Override
             public void onError(DataError error) {
                 callback.onError(error == DataError.BOOKING_SERVICE_UNAVAILABLE
-                        ? error : DataError.BOOKING_CANCEL_FAILED);
+                        ? error : DataError.BOOKING_DELETE_FAILED);
             }
         });
     }
@@ -240,7 +234,7 @@ public class BookingRepository {
             callback.onError(DataError.HOME_UNAVAILABLE);
             return;
         }
-        execute(bookingApi.getForHome(unitId), operation, new RepositoryCallback<List<BookingDTO>>() {
+        execute(bookingApi.getForHome("eq." + unitId), operation, new RepositoryCallback<List<BookingDTO>>() {
             @Override
             public void onSuccess(List<BookingDTO> data) {
                 List<Booking> bookings = new ArrayList<>();
@@ -309,7 +303,7 @@ public class BookingRepository {
                 if (source.isCanceled() || operation != version) return;
                 if (!response.isSuccessful()) {
                     boolean missingBookingService = response.code() == 404
-                            && source.request().url().encodedPath().contains("/rpc/");
+                            && source.request().url().encodedPath().endsWith("/bookings");
                     DataError error = response.code() == 409 ? DataError.BOOKING_CONFLICT
                             : missingBookingService ? DataError.BOOKING_SERVICE_UNAVAILABLE : DataError.LOAD_FAILED;
                     callback.onError(error);
@@ -325,7 +319,7 @@ public class BookingRepository {
         });
     }
 
-    // Interrompe o pedido HTTP ao sair do ecrã; não cancela uma marcação guardada.
+    // Interrompe apenas o pedido HTTP ao sair do ecrã.
     public void cancel() {
         version++;
         if (activeRequest != null) activeRequest.cancel();

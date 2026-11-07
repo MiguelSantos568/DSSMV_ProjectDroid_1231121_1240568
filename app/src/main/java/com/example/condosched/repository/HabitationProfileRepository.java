@@ -6,7 +6,7 @@ import com.example.condosched.domain.HabitationProfile;
 import com.example.condosched.domain.DataError;
 
 import com.example.condosched.dto.HabitationProfileDTO;
-import com.example.condosched.dto.ProfileRequestDTO;
+import com.example.condosched.domain.ProfileContactValidator;
 
 import java.util.List;
 
@@ -28,16 +28,23 @@ public class HabitationProfileRepository {
     }
 
     public void find(long unitId, RepositoryCallback<HabitationProfile> callback) {
-        ProfileRequestDTO request = new ProfileRequestDTO();
-        request.setUnitId(unitId);
-        execute(api.find(request), unitId, true, callback);
+        if (unitId <= 0) {
+            callback.onError(DataError.HOME_UNAVAILABLE);
+            return;
+        }
+        execute(api.find("eq." + unitId), unitId, true, callback);
     }
 
     public void create(long unitId, String name, String email, RepositoryCallback<HabitationProfile> callback) {
-        ProfileRequestDTO request = new ProfileRequestDTO();
+        DataError error = ProfileContactValidator.validate(name, email);
+        if (unitId <= 0 || error != null) {
+            callback.onError(unitId <= 0 ? DataError.HOME_UNAVAILABLE : error);
+            return;
+        }
+        HabitationProfileDTO request = new HabitationProfileDTO();
         request.setUnitId(unitId);
-        request.setFullName(name);
-        request.setEmail(email);
+        request.setFullName(name.trim());
+        request.setEmail(email.trim());
         execute(api.create(request), unitId, false, callback);
     }
 
@@ -52,6 +59,22 @@ public class HabitationProfileRepository {
                                    Response<List<HabitationProfileDTO>> response) {
                 if (request.isCanceled() || current != version) return;
                 if (!response.isSuccessful()) {
+                    // Outra instalação pode ter registado a mesma casa primeiro.
+                    if (response.code() == 409 && !allowMissing) {
+                        find(unitId, new RepositoryCallback<HabitationProfile>() {
+                            @Override
+                            public void onSuccess(HabitationProfile profile) {
+                                if (profile == null) callback.onError(DataError.INVALID_RESPONSE);
+                                else callback.onSuccess(profile);
+                            }
+
+                            @Override
+                            public void onError(DataError error) {
+                                callback.onError(error);
+                            }
+                        });
+                        return;
+                    }
                     callback.onError(response.code() == 404 ? DataError.SERVICE_UNAVAILABLE : DataError.LOAD_FAILED);
                     return;
                 }
@@ -68,7 +91,9 @@ public class HabitationProfileRepository {
                     callback.onError(DataError.INVALID_RESPONSE);
                     return;
                 }
-                callback.onSuccess(HabitationProfileMapper.toDomain(profiles.get(0)));
+                HabitationProfileDTO profile = profiles.get(0);
+                callback.onSuccess(new HabitationProfile(profile.getUnitId(),
+                        profile.getFullName(), profile.getEmail()));
             }
 
             @Override

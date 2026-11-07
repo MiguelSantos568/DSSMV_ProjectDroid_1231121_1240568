@@ -1,30 +1,25 @@
 # CondoSched
 
-Projeto Android em Java da unidade curricular DSSMV 2026/27. Compatível com API 26+.
+Aplicação Android em Java para DSSMV 2026/27, compatível com API 26+.
+O acesso é feito por QR de uma habitação. A app consulta comodidades e permite
+criar, consultar e apagar marcações.
 
-O ponto de entrada é `ui/AccessActivity`. O código está separado em `ui`, `viewmodel`,
-`repository`, `network`, `dto`, `domain` e `session`.
+## Guias para estudar
 
-Documentação técnica:
+1. [Organização e relação com as teóricas](app/doc/Architecture-guide.md)
+2. [QR, registo e sessão](app/doc/QR-access.md)
+3. [Comodidades e marcações](app/doc/Bookings.md)
 
-- [Organização geral da app](app/doc/Architecture-guide.md)
-- [Acesso por QR, registo e sessão](app/doc/QR-access.md)
-- [Comodidades e marcações](app/doc/Bookings.md)
-- [Diagrama dos modelos de domínio](app/doc/DomainModel.puml)
+[Diagrama do domínio](app/doc/DomainModel.puml) ·
+[Proposta inicial](app/doc/CondoSched.md) · [Equipa](app/doc/TeamComposition.md)
 
-`Habitation` representa a casa selecionada e o seu condomínio/prédio. Os DTOs
-`UnitDTO`, `BuildingDTO` e `CondominiumDTO` são os contratos da API, convertidos
-para esse modelo. Os testes estão em `app/src/test`, separados do código da app.
+A TheCondo é usada para consulta; o Supabase guarda contactos e reservas por
+GET, POST e DELETE. O acesso da demonstração usa dados fictícios e não tem
+login individual. Os scripts em `app/doc/supabase` são da configuração antiga;
+não são usados pela app atual.
 
-Perfis e reservas são guardados no Supabase. A TheCondo é usada apenas para
-consultar os dados do condomínio, habitações, comodidades e residentes.
-
-No SQL Editor do Supabase, executar primeiro `app/doc/supabase/habitation_profiles.sql`
-e depois `app/doc/supabase/bookings.sql`. Para dados de teste opcionais, consultar
-`app/doc/supabase/bookings_bootstrap.sql`.
-
-Com Gradle instalado, executar:
+No Windows, compilar e verificar com o Gradle Wrapper do projeto:
 
 ```text
-gradle :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
+.\gradlew.bat :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```

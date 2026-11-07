@@ -10,13 +10,14 @@ import com.example.condosched.domain.DataError;
 import com.example.condosched.repository.RepositoryCallback;
 
 import java.util.List;
+import java.util.Collections;
 
 /**
- * T6: holds screen state without keeping an Activity or Android View reference.
+ * Mantém os dados do ecrã sem guardar referências à Activity ou às Views.
  */
 public class AmenitiesViewModel extends ViewModel {
     private final AmenityRepository repository;
-    private final MutableLiveData<AmenitiesState> state = new MutableLiveData<>();
+    private final MutableLiveData<UiState<List<Amenity>>> state = new MutableLiveData<>(UiState.idle());
     private Habitation currentHome;
 
     public AmenitiesViewModel() {
@@ -27,14 +28,13 @@ public class AmenitiesViewModel extends ViewModel {
         this.repository = repository;
     }
 
-    // The Activity can observe state, but only the ViewModel can change it.
-    public LiveData<AmenitiesState> getState() {
+    public LiveData<UiState<List<Amenity>>> getState() {
         return state;
     }
 
     public void load(Habitation home) {
-        // ViewModelProvider returns this same instance after rotation: do not repeat the HTTP request.
-        if (currentHome != null && currentHome.unitId == home.unitId && state.getValue() != null) return;
+        // A rotação reutiliza o ViewModel sem repetir o pedido HTTP.
+        if (currentHome != null && currentHome.unitId == home.unitId) return;
         currentHome = home;
         fetch();
     }
@@ -44,35 +44,16 @@ public class AmenitiesViewModel extends ViewModel {
     }
 
     private void fetch() {
-        state.setValue(AmenitiesState.loading(currentHome));
-        if (currentHome.condominiumId > 0) {
-            loadAmenities();
-        } else {
-            repository.findHome(currentHome.unitId, new RepositoryCallback<Habitation>() {
-                @Override
-                public void onSuccess(Habitation home) {
-                    currentHome = home;
-                    loadAmenities();
-                }
-
-                @Override
-                public void onError(DataError error) {
-                    state.setValue(AmenitiesState.failure(currentHome, error));
-                }
-            });
-        }
-    }
-
-    private void loadAmenities() {
+        state.setValue(UiState.loading(Collections.emptyList()));
         repository.getByCondominium(currentHome.condominiumId, new RepositoryCallback<List<Amenity>>() {
             @Override
             public void onSuccess(List<Amenity> amenities) {
-                state.setValue(AmenitiesState.success(currentHome, amenities));
+                state.setValue(UiState.success(amenities));
             }
 
             @Override
             public void onError(DataError error) {
-                state.setValue(AmenitiesState.failure(currentHome, error));
+                state.setValue(UiState.failure(error, Collections.emptyList()));
             }
         });
     }

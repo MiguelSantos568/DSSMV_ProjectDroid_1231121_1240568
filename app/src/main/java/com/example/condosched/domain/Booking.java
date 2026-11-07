@@ -16,19 +16,6 @@ public class Booking {
     public Booking() {
     }
 
-    public Booking(long id, long amenityId, long residentId, String startTime, String endTime, String status,
-                   int numberOfGuests, double fee, String notes) {
-        this.id = id;
-        this.amenityId = amenityId;
-        this.residentId = residentId;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.status = status;
-        this.numberOfGuests = numberOfGuests;
-        this.fee = fee;
-        this.notes = notes;
-    }
-
     public long getId() {
         return id;
     }
@@ -87,10 +74,6 @@ public class Booking {
 
     public String getStatus() {
         return status;
-    }
-
-    public boolean canCancel() {
-        return "confirmed".equalsIgnoreCase(status) || "pending".equalsIgnoreCase(status);
     }
 
     public void setStatus(String status) {

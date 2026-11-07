@@ -1,25 +1,28 @@
 package com.example.condosched.network;
 
 import com.example.condosched.dto.BookingDTO;
-import com.example.condosched.dto.BookingRequestDTO;
-import com.example.condosched.dto.CancelBookingRequestDTO;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
+import retrofit2.http.Headers;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public interface BookingApi {
-    @GET("rpc/get_home_bookings")
-    Call<List<BookingDTO>> getForHome(@Query("p_unit_id") long unitId);
+    @GET("bookings")
+    Call<List<BookingDTO>> getForHome(@Query("unit_id") String unitFilter);
 
-    @GET("rpc/get_amenity_bookings")
-    Call<List<BookingDTO>> getForAmenity(@Query("p_amenity_id") long amenityId);
+    @GET("bookings?select=amenity_id,start_time,end_time,status&status=in.(confirmed,pending)")
+    Call<List<BookingDTO>> getForAmenity(@Query("amenity_id") String amenityFilter);
 
-    @POST("rpc/create_booking")
-    Call<List<BookingDTO>> create(@Body BookingRequestDTO request);
+    @Headers("Prefer: return=representation")
+    @POST("bookings")
+    Call<List<BookingDTO>> create(@Body BookingDTO booking);
 
-    @POST("rpc/cancel_booking")
-    Call<List<BookingDTO>> cancelBooking(@Body CancelBookingRequestDTO request);
+    @Headers("Prefer: return=representation")
+    @DELETE("bookings?select=id,unit_id")
+    Call<List<BookingDTO>> deleteBooking(@Query("id") String bookingFilter,
+                                       @Query("unit_id") String unitFilter);
 }

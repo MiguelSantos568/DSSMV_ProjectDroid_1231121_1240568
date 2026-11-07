@@ -113,13 +113,15 @@ public class BookingRepositoryTest {
         assertEquals("/api/amenities/3", condo.takeRequest().getPath());
         assertEquals("/api/residents/active", condo.takeRequest().getPath());
         assertEquals(2, condo.getRequestCount());
-        assertEquals("/rest/v1/rpc/get_amenity_bookings?p_amenity_id=3", supabase.takeRequest().getPath());
+        assertEquals("/rest/v1/bookings?select=amenity_id,start_time,end_time,status&status=in.(confirmed,pending)&amenity_id=eq.3", supabase.takeRequest().getPath());
         RecordedRequest request = supabase.takeRequest();
         assertEquals("POST", request.getMethod());
-        assertEquals("/rest/v1/rpc/create_booking", request.getPath());
-        JsonObject json = JsonParser.parseString(request.getBody().readUtf8()).getAsJsonObject().getAsJsonObject("p_booking");
+        assertEquals("/rest/v1/bookings", request.getPath());
+        JsonObject json = JsonParser.parseString(request.getBody().readUtf8()).getAsJsonObject();
         assertFalse(json.has("id"));
         assertFalse(json.has("amenityId"));
+        assertFalse(json.has("p_booking"));
+        assertEquals("return=representation", request.getHeader("Prefer"));
         assertEquals(1, json.get("unit_id").getAsLong());
         assertEquals(9, json.get("resident_id").getAsLong());
         assertEquals(3, json.get("amenity_id").getAsLong());
@@ -186,7 +188,7 @@ public class BookingRepositoryTest {
     public void databaseConflictAfterPreflightIsReportedAsConflict() throws Exception {
         enqueueRulesAndResident();
         enqueue(supabase, "[]");
-        supabase.enqueue(new MockResponse().setResponseCode(409).setBody("{\"code\":\"PT409\"}"));
+        supabase.enqueue(new MockResponse().setResponseCode(409).setBody("{\"code\":\"23P01\"}"));
         assertEquals(DataError.BOOKING_CONFLICT, create().error);
     }
 
@@ -211,7 +213,7 @@ public class BookingRepositoryTest {
         assertEquals(1, result.data.size());
         assertEquals("Sala", result.data.get(0).getAmenityName());
         assertEquals(11, result.data.get(0).getResidentId());
-        assertEquals("/rest/v1/rpc/get_home_bookings?p_unit_id=1", supabase.takeRequest().getPath());
+        assertEquals("/rest/v1/bookings?unit_id=eq.1", supabase.takeRequest().getPath());
         assertEquals("/api/amenities", condo.takeRequest().getPath());
         assertEquals(1, condo.getRequestCount());
     }
@@ -238,7 +240,7 @@ public class BookingRepositoryTest {
     }
 
     @Test
-    public void missingSupabaseFunctionsShowServiceUnavailableWithoutFallback() throws Exception {
+    public void missingBookingsTableShowsServiceUnavailableWithoutFallback() throws Exception {
         enqueueRulesAndResident();
         supabase.enqueue(new MockResponse().setResponseCode(404));
         assertEquals(DataError.BOOKING_SERVICE_UNAVAILABLE, create().error);
@@ -247,7 +249,7 @@ public class BookingRepositoryTest {
     }
 
     @Test
-    public void missingCreateFunctionIsNotReportedAsSaved() throws Exception {
+    public void missingCreateEndpointIsNotReportedAsSaved() throws Exception {
         enqueueRulesAndResident();
         enqueue(supabase, "[]");
         supabase.enqueue(new MockResponse().setResponseCode(404));
@@ -280,7 +282,7 @@ public class BookingRepositoryTest {
     }
 
     @Test
-    public void cancellationSuppressesLateCallbacks() throws Exception {
+    public void requestCancellationSuppressesLateCallbacks() throws Exception {
         condo.enqueue(new MockResponse().setBody(RESIDENTS).setBodyDelay(300, TimeUnit.MILLISECONDS));
         Result<List<Resident>> result = new Result<>();
         repository.loadResidents(1, result);
@@ -290,57 +292,55 @@ public class BookingRepositoryTest {
     }
 
     @Test
-    public void cancellationUpdatesOnlySupabaseAndIncludesHomeAndBookingIds() throws Exception {
+    public void deletionUsesDeleteWithHomeAndBookingFilters() throws Exception {
         enqueue(supabase, "[" + booking(25, 1, 9, start.toString(), end.toString(), "cancelled") + "]");
-        Result<Booking> result = new Result<>();
-        repository.cancelBooking(1, 25, result);
+        Result<Long> result = new Result<>();
+        repository.deleteBooking(1, 25, result);
         result.await();
         assertNull(result.error);
-        assertEquals("cancelled", result.data.getStatus());
-        assertFalse(result.data.canCancel());
+        assertEquals(Long.valueOf(25), result.data);
         assertEquals(0, condo.getRequestCount());
         RecordedRequest request = supabase.takeRequest();
-        assertEquals("POST", request.getMethod());
-        assertEquals("/rest/v1/rpc/cancel_booking", request.getPath());
-        JsonObject body = JsonParser.parseString(request.getBody().readUtf8()).getAsJsonObject();
-        assertEquals(1, body.get("p_unit_id").getAsLong());
-        assertEquals(25, body.get("p_booking_id").getAsLong());
+        assertEquals("DELETE", request.getMethod());
+        assertEquals("/rest/v1/bookings?select=id,unit_id&id=eq.25&unit_id=eq.1", request.getPath());
+        assertEquals("return=representation", request.getHeader("Prefer"));
+        assertEquals(0, request.getBodySize());
     }
 
     @Test
-    public void cancellationCannotAcceptAResponseFromAnotherHome() throws Exception {
+    public void deletionCannotAcceptAResponseFromAnotherHome() throws Exception {
         enqueue(supabase, "[" + booking(25, 2, 9, start.toString(), end.toString(), "cancelled") + "]");
-        Result<Booking> result = new Result<>();
-        repository.cancelBooking(1, 25, result);
+        Result<Long> result = new Result<>();
+        repository.deleteBooking(1, 25, result);
         result.await();
-        assertEquals(DataError.BOOKING_CANCEL_FAILED, result.error);
+        assertEquals(DataError.BOOKING_DELETE_FAILED, result.error);
     }
 
     @Test
-    public void emptyCancellationResponseMeansBookingNotFound() throws Exception {
+    public void emptyDeletionResponseMeansBookingNotFound() throws Exception {
         enqueue(supabase, "[]");
-        Result<Booking> result = new Result<>();
-        repository.cancelBooking(1, 25, result);
+        Result<Long> result = new Result<>();
+        repository.deleteBooking(1, 25, result);
         result.await();
         assertEquals(DataError.NOT_FOUND, result.error);
     }
 
     @Test
-    public void cancellationFailureDoesNotBecomeSuccess() throws Exception {
+    public void deletionFailureDoesNotBecomeSuccess() throws Exception {
         supabase.enqueue(new MockResponse().setResponseCode(503));
-        Result<Booking> result = new Result<>();
-        repository.cancelBooking(1, 25, result);
+        Result<Long> result = new Result<>();
+        repository.deleteBooking(1, 25, result);
         result.await();
-        assertEquals(DataError.BOOKING_CANCEL_FAILED, result.error);
+        assertEquals(DataError.BOOKING_DELETE_FAILED, result.error);
         assertNull(result.data);
         assertEquals(0, condo.getRequestCount());
     }
 
     @Test
-    public void missingCancellationFunctionIsReportedAsUnavailable() throws Exception {
+    public void missingBookingsTableIsReportedAsUnavailable() throws Exception {
         supabase.enqueue(new MockResponse().setResponseCode(404));
-        Result<Booking> result = new Result<>();
-        repository.cancelBooking(1, 25, result);
+        Result<Long> result = new Result<>();
+        repository.deleteBooking(1, 25, result);
         result.await();
         assertEquals(DataError.BOOKING_SERVICE_UNAVAILABLE, result.error);
     }
@@ -366,12 +366,12 @@ public class BookingRepositoryTest {
     }
 
     @Test
-    public void invalidCancellationResponseCannotUpdateTheLocalBooking() throws Exception {
-        enqueue(supabase, "[" + booking(25, 1, 9, end.toString(), start.toString(), "cancelled") + "]");
-        Result<Booking> result = new Result<>();
-        repository.cancelBooking(1, 25, result);
+    public void deletionRejectsAnUnexpectedBookingIdentifier() throws Exception {
+        enqueue(supabase, "[" + booking(26, 1, 9, start.toString(), end.toString(), "confirmed") + "]");
+        Result<Long> result = new Result<>();
+        repository.deleteBooking(1, 25, result);
         result.await();
-        assertEquals(DataError.BOOKING_CANCEL_FAILED, result.error);
+        assertEquals(DataError.BOOKING_DELETE_FAILED, result.error);
     }
 
     private static class Result<T> implements RepositoryCallback<T> {

@@ -37,12 +37,12 @@
     <string name="booking_status_cancelled">Cancelada</string>
     <string name="booking_status_rejected">Rejeitada</string>
     <string name="booking_status_unknown">Não indicado</string>
-    <string name="booking_cancel">Cancelar marcação</string>
-    <string name="booking_cancel_title">Cancelar esta marcação?</string>
-    <string name="booking_cancel_message">Queres cancelar a marcação de %1$s (%2$s)? Fica no histórico e o horário volta a estar disponível.</string>
+    <string name="booking_delete">Apagar marcação</string>
+    <string name="booking_delete_title">Apagar esta marcação?</string>
+    <string name="booking_delete_message">Queres apagar a marcação de %1$s (%2$s)? É removida definitivamente e o horário volta a estar disponível.</string>
     <string name="booking_keep">Manter marcação</string>
-    <string name="booking_cancelling">A cancelar marcação…</string>
-    <string name="booking_cancelled">Marcação cancelada.</string>
-    <string name="booking_cancel_failed">Não foi possível confirmar o cancelamento. Atualiza a lista para verificar o estado.</string>
-    <string name="booking_not_found">A marcação não foi encontrada ou já não pode ser cancelada. Atualiza a lista.</string>
+    <string name="booking_deleting">A apagar marcação…</string>
+    <string name="booking_deleted">Marcação apagada.</string>
+    <string name="booking_delete_failed">Não foi possível confirmar a eliminação. Atualiza a lista antes de tentar novamente.</string>
+    <string name="booking_not_found">A marcação não foi encontrada. Atualiza a lista.</string>
 </resources>

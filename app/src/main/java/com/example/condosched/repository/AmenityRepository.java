@@ -2,7 +2,6 @@ package com.example.condosched.repository;
 
 import com.example.condosched.dto.AmenityDTO;
 import com.example.condosched.domain.Amenity;
-import com.example.condosched.domain.Habitation;
 import com.example.condosched.network.ApiClient;
 import com.example.condosched.network.AmenityApi;
 import com.example.condosched.domain.DataError;
@@ -21,8 +20,6 @@ public class AmenityRepository {
     private final AmenityApi api;
     private Call<?> activeRequest;
     private int requestVersion;
-
-    private final HabitationRepository homes = new HabitationRepository();
 
     public AmenityRepository() {
         this(ApiClient.amenities());
@@ -94,14 +91,8 @@ public class AmenityRepository {
         });
     }
 
-    public void findHome(long unitId, RepositoryCallback<Habitation> callback) {
-        cancel();
-        homes.find(unitId, callback);
-    }
-
     public void cancel() {
         requestVersion++;
-        homes.cancel();
         if (activeRequest != null) activeRequest.cancel();
     }
 }

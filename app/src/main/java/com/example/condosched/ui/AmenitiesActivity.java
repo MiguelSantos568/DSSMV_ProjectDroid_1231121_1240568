@@ -9,10 +9,12 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.condosched.R;
 import com.example.condosched.domain.Amenity;
 import com.example.condosched.ui.adapter.AmenityAdapter;
-import com.example.condosched.domain.Habitation;
 import com.example.condosched.domain.DataError;
-import com.example.condosched.viewmodel.AmenitiesState;
 import com.example.condosched.viewmodel.AmenitiesViewModel;
+import com.example.condosched.viewmodel.UiState;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Displays state and forwards user actions. Network requests belong to the Repository.
@@ -34,6 +36,7 @@ public class AmenitiesActivity extends SessionActivity {
         progress = findViewById(R.id.amenitiesProgress);
         retry = findViewById(R.id.retryAmenitiesButton);
         list = findViewById(R.id.amenitiesList);
+        context.setText(currentSession().getHome().condominium);
         BottomNavigation.bind(this, R.id.navCondo);
         findViewById(R.id.navCondo).setOnClickListener(v -> startActivity(
                 new Intent(this, CondominiumActivity.class).addFlags(
@@ -50,28 +53,24 @@ public class AmenitiesActivity extends SessionActivity {
         viewModel.load(currentSession().getHome());
     }
 
-    private void render(AmenitiesState state) {
-        Habitation home = state.getHome();
-        context.setText(home.condominium);
-        // Preserve support for sessions created before condominium IDs were stored locally.
-        if (currentSession().getHome().condominiumId == 0 && home.condominiumId > 0) {
-            sessionViewModel.updateHome(home);
-        }
-        boolean loading = state.getStatus() == AmenitiesState.Status.LOADING;
-        boolean error = state.getStatus() == AmenitiesState.Status.ERROR;
-        boolean content = state.getStatus() == AmenitiesState.Status.CONTENT;
+    private void render(UiState<List<Amenity>> state) {
+        List<Amenity> amenities = state.getData() == null ? Collections.emptyList() : state.getData();
+        boolean loading = state.getStatus() == UiState.Status.LOADING;
+        boolean error = state.getStatus() == UiState.Status.ERROR;
+        boolean success = state.getStatus() == UiState.Status.SUCCESS;
+        boolean content = success && !amenities.isEmpty();
         progress.setVisibility(loading ? View.VISIBLE : View.GONE);
         retry.setVisibility(error ? View.VISIBLE : View.GONE);
         status.setVisibility(content ? View.GONE : View.VISIBLE);
         list.setVisibility(content ? View.VISIBLE : View.GONE);
-        count.setVisibility(loading || error ? View.GONE : View.VISIBLE);
-        int size = state.getAmenities().size();
+        count.setVisibility(success ? View.VISIBLE : View.GONE);
+        int size = amenities.size();
         count.setText(getResources().getQuantityString(R.plurals.amenities_count, size, size));
 
         if (loading) status.setText(R.string.amenities_loading);
         else if (error) status.setText(errorMessage(state.getError()));
-        else if (!content) status.setText(R.string.amenities_empty);
-        else list.setAdapter(new AmenityAdapter(this, state.getAmenities()));
+        else if (success && !content) status.setText(R.string.amenities_empty);
+        else if (content) list.setAdapter(new AmenityAdapter(this, amenities));
     }
 
     private int errorMessage(DataError error) {
