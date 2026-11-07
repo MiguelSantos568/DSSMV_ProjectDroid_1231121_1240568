@@ -20,7 +20,7 @@
     <string name="booking_invalid_people">Enter at least one person without exceeding the capacity of the space.</string>
     <string name="booking_resident_required">Choose an active resident of your home.</string>
     <string name="booking_no_residents">This home has no active residents in TheCondo. Contact the condominium manager to register a resident before booking.</string>
-    <string name="booking_conflict">This period is already booked. Choose another time.</string>
+    <string name="booking_conflict">There is not enough capacity during this period. Reduce the number of people or choose another time.</string>
     <string name="booking_unavailable">This space is no longer available for booking.</string>
     <string name="booking_failed">Could not confirm the result. Check your bookings before submitting again.</string>
     <string name="booking_service_unavailable">The booking service is unavailable. Please try again later.</string>

@@ -14,8 +14,10 @@ public interface BookingApi {
     @GET("bookings")
     Call<List<BookingDTO>> getForHome(@Query("unit_id") String unitFilter);
 
-    @GET("bookings?select=amenity_id,start_time,end_time,status&status=in.(confirmed,pending)")
-    Call<List<BookingDTO>> getForAmenity(@Query("amenity_id") String amenityFilter);
+    @GET("bookings?select=amenity_id,start_time,end_time,status,number_of_people&status=in.(confirmed,pending)")
+    Call<List<BookingDTO>> getForAmenity(@Query("amenity_id") String amenityFilter,
+                                       @Query("start_time") String startsBefore,
+                                       @Query("end_time") String endsAfter);
 
     @Headers("Prefer: return=representation")
     @POST("bookings")

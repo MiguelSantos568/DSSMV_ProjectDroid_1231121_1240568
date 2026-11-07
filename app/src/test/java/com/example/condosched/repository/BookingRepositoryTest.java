@@ -113,7 +113,15 @@ public class BookingRepositoryTest {
         assertEquals("/api/amenities/3", condo.takeRequest().getPath());
         assertEquals("/api/residents/active", condo.takeRequest().getPath());
         assertEquals(2, condo.getRequestCount());
-        assertEquals("/rest/v1/bookings?select=amenity_id,start_time,end_time,status&status=in.(confirmed,pending)&amenity_id=eq.3", supabase.takeRequest().getPath());
+        RecordedRequest availability = supabase.takeRequest();
+        assertEquals("GET", availability.getMethod());
+        assertEquals("/rest/v1/bookings", availability.getRequestUrl().encodedPath());
+        assertEquals("amenity_id,start_time,end_time,status,number_of_people",
+                availability.getRequestUrl().queryParameter("select"));
+        assertEquals("in.(confirmed,pending)", availability.getRequestUrl().queryParameter("status"));
+        assertEquals("eq.3", availability.getRequestUrl().queryParameter("amenity_id"));
+        assertEquals("lt." + end, availability.getRequestUrl().queryParameter("start_time"));
+        assertEquals("gt." + start, availability.getRequestUrl().queryParameter("end_time"));
         RecordedRequest request = supabase.takeRequest();
         assertEquals("POST", request.getMethod());
         assertEquals("/rest/v1/bookings", request.getPath());
@@ -151,19 +159,41 @@ public class BookingRepositoryTest {
     }
 
     @Test
-    public void overlappingBookingOfAnotherHomeInSupabaseBlocksThePeriod() throws Exception {
+    public void overlappingBookingOfAnotherHomeBlocksOnlyWhenCapacityIsExceeded() throws Exception {
         enqueueRulesAndResident();
-        enqueue(supabase, "[" + booking(1, 2, 10, start.minusMinutes(15).toString(), end.toString(), "PENDING") + "]");
+        enqueue(supabase, "[" + booking(1, 2, 10, start.minusMinutes(15).toString(), end.toString(), "pending")
+                .replace("\"number_of_people\":2", "\"number_of_people\":9") + "]");
         assertEquals(DataError.BOOKING_CONFLICT, create().error);
         assertEquals(1, supabase.getRequestCount());
     }
 
     @Test
-    public void availabilityNeedsOnlyTimesWithoutResidentOrContactDetails() throws Exception {
+    public void availabilityCountsPeopleWithoutResidentOrContactDetailsAndAllowsExactCapacity() throws Exception {
+        enqueueRulesAndResident();
+        enqueue(supabase, "[{\"amenity_id\":3,\"start_time\":\"" + start
+                + "\",\"end_time\":\"" + end + "\",\"status\":\"confirmed\",\"number_of_people\":8}]");
+        enqueue(supabase, savedBooking());
+        assertNull(create().error);
+        assertEquals(2, supabase.getRequestCount());
+        assertEquals("GET", supabase.takeRequest().getMethod());
+        assertEquals("POST", supabase.takeRequest().getMethod());
+    }
+
+    @Test
+    public void missingOccupancyDoesNotAllowWritingWithAnUnknownTotal() throws Exception {
         enqueueRulesAndResident();
         enqueue(supabase, "[{\"amenity_id\":3,\"start_time\":\"" + start
                 + "\",\"end_time\":\"" + end + "\",\"status\":\"confirmed\"}]");
-        assertEquals(DataError.BOOKING_CONFLICT, create().error);
+        assertEquals(DataError.INVALID_RESPONSE, create().error);
+        assertEquals(1, supabase.getRequestCount());
+    }
+
+    @Test
+    public void nullAvailabilityEntryDoesNotAllowWritingWithAnUnknownTotal() throws Exception {
+        enqueueRulesAndResident();
+        enqueue(supabase, "[null]");
+        assertEquals(DataError.INVALID_RESPONSE, create().error);
+        assertEquals(1, supabase.getRequestCount());
     }
 
     @Test

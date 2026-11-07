@@ -15,7 +15,7 @@ confirmação e remove definitivamente a reserva.
 | `AmenityRepository`, `AmenityMapper` | Consultar, filtrar espaços ativos do condomínio e converter DTOs |
 | `AmenityDetailActivity` | Apresentar a comodidade recebida no Intent |
 | `CreateBookingActivity`, `CreateBookingViewModel` | Formulário, estado e submissão |
-| `BookingValidator` | Validar período, horário, capacidade e sobreposições |
+| `BookingValidator` | Validar período, horário e lotação total em cada momento |
 | `BookingRepository` | Consultar regras/residentes, verificar disponibilidade, criar/listar/apagar |
 | `BookingApi`, `BookingDTO`, `BookingMapper` | Contrato HTTP, JSON e conversão para domínio |
 | `BookingsActivity`, `BookingsViewModel` | Lista e coordenação da eliminação |
@@ -36,8 +36,8 @@ residente responsável. Sem residente ativo, não é possível criar uma marcaç
 1. Consulta a comodidade atual na TheCondo para obter horário, capacidade e taxa.
 2. Usa `BookingValidator` para conferir as regras.
 3. Confirma que o residente continua ativo e pertence à casa.
-4. Consulta no Supabase os períodos confirmados ou pendentes do espaço.
-5. Verifica sobreposições em Java.
+4. Consulta no Supabase os períodos confirmados/pendentes que cruzam o horário pedido e o número de pessoas de cada reserva.
+5. Soma em Java as pessoas presentes em cada momento e verifica a capacidade do espaço.
 6. Prepara `BookingDTO`, define `status` como `confirmed` e envia POST.
 7. Valida a resposta, converte-a em `Booking` e entrega-a ao ViewModel.
 
@@ -51,13 +51,43 @@ guardado da Activity; os campos do formulário são restaurados pelo Android.
 - Um dia de cada vez; fim às 00:00 corresponde à meia-noite seguinte.
 - Pessoas: número positivo e dentro da capacidade conhecida.
 - O período deve respeitar o horário de funcionamento conhecido.
-- Reservas confirmadas/pendentes bloqueiam sobreposições; canceladas/rejeitadas não.
+- Reservas confirmadas/pendentes contam para a lotação; canceladas/rejeitadas não.
+- Várias reservas podem partilhar o horário se a lotação total não exceder a capacidade.
+- Sem capacidade conhecida, mantém-se o comportamento de reserva exclusiva.
 - Uma reserva pode começar exatamente quando outra termina.
 - Datas interpretadas na hora do condomínio, `Europe/Lisbon`.
 
-A consulta e o POST são pedidos separados. A restrição já existente na tabela
-impede sobreposições em escritas simultâneas; o Repository trata HTTP 409 como
-conflito de horário. A lógica de preparação e validação da app está em Java.
+`validate()` continua a verificar os dados da nova reserva. Depois,
+`validateAvailability(amenity, start, end, people, bookings)` verifica a lotação.
+Um TreeMap ordena os instantes de entrada e saída: entradas somam pessoas e
+saídas subtraem. Movimentos à mesma hora são agrupados, permitindo que uma
+reserva comece exatamente quando outra termina. O cálculo usa `long` para evitar
+overflow da soma de pessoas.
+
+Exemplo: capacidade 10, reserva A de 6 pessoas das 10h às 11h e B de 6 das 11h
+às 12h. Uma nova reserva de 4 pessoas das 10h às 12h é permitida: o máximo é
+10 pessoas em simultâneo, não 16. A ordem da lista recebida não altera o resultado.
+
+## Ajuste necessário na base existente
+
+A configuração antiga criou `bookings_no_overlap`, que proíbe qualquer
+sobreposição mesmo com lugares disponíveis. Foi confirmado no Supabase um erro
+HTTP 400 / `23P01` ao tentar sobrepor duas reservas temporárias de uma pessoa;
+a reserva de teste criada foi removida. Essa restrição tem de ser retirada para
+o novo comportamento funcionar. No SQL Editor, executar apenas:
+
+```sql
+alter table public.bookings drop constraint if exists bookings_no_overlap;
+```
+
+Isto altera a estrutura da tabela, não apaga reservas nem cria funções.
+Não voltar a executar os scripts históricos que repõem a restrição antiga.
+Esta alteração ainda não foi aplicada remotamente: a app não tem permissões de
+administração da base.
+
+A lógica de lotação fica no Java. Como a consulta e o POST são pedidos separados,
+duas submissões simultâneas podem ultrapassar a capacidade. Este protótipo não
+garante a lotação de forma atómica no servidor.
 
 ## Pedidos HTTP
 
@@ -67,11 +97,12 @@ No Supabase, `BookingApi` usa diretamente a tabela:
 | Operação | Pedido |
 | --- | --- |
 | Reservas da casa | `GET /rest/v1/bookings?unit_id=eq.ID` |
-| Disponibilidade | `GET /rest/v1/bookings?select=amenity_id,start_time,end_time,status&status=in.(confirmed,pending)&amenity_id=eq.ID` |
+| Disponibilidade | `GET /rest/v1/bookings?select=amenity_id,start_time,end_time,status,number_of_people&status=in.(confirmed,pending)&amenity_id=eq.ID&start_time=lt.FIM&end_time=gt.INICIO` |
 | Criar | `POST /rest/v1/bookings` |
 | Apagar | `DELETE /rest/v1/bookings?select=id,unit_id&id=eq.ID&unit_id=eq.CASA` |
 
 `eq.` significa igual a; `select` escolhe as colunas; `in.` filtra vários estados.
+`lt.FIM` e `gt.INICIO` limitam a consulta às reservas que cruzam o período pedido.
 POST e DELETE usam `Prefer: return=representation` para confirmar o resultado.
 O acesso da demonstração é público e os dados são fictícios. Filtrar por casa no
 Java não é autenticação nem impede pedidos feitos fora da app.

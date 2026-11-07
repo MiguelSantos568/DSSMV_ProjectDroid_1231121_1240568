@@ -2,6 +2,8 @@ package com.example.condosched.domain;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.Collections;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -11,6 +13,7 @@ public class BookingValidatorTest {
 
     private Amenity amenity() {
         Amenity amenity = new Amenity();
+        amenity.setId(1);
         amenity.setActive(true);
         amenity.setCapacity(10);
         amenity.setOpeningTime(LocalTime.of(8, 0));
@@ -72,5 +75,129 @@ public class BookingValidatorTest {
         assertTrue(BookingValidator.overlaps(start, start.plusHours(1), start.plusMinutes(30), start.plusHours(2)));
         assertTrue(BookingValidator.overlaps(start, start.plusHours(2), start.plusMinutes(30), start.plusHours(1)));
         assertTrue(BookingValidator.overlaps(start, start.plusHours(1), start.minusHours(1), start.plusHours(2)));
+    }
+
+    private Booking booking(LocalDateTime from, LocalDateTime until, int people, String status) {
+        Booking booking = new Booking();
+        booking.setAmenityId(1);
+        booking.setStartTime(from.toString());
+        booking.setEndTime(until.toString());
+        booking.setNumberOfGuests(people);
+        booking.setStatus(status);
+        return booking;
+    }
+
+    @Test
+    public void sharedPeriodAcceptsExactCapacityAndRejectsOnePersonOver() {
+        Booking existing = booking(start, start.plusHours(1), 2, "confirmed");
+        assertNull(BookingValidator.validateAvailability(amenity(), start, start.plusHours(1), 8,
+                Collections.singletonList(existing)));
+        assertEquals(DataError.BOOKING_CONFLICT,
+                BookingValidator.validateAvailability(amenity(), start, start.plusHours(1), 9,
+                        Collections.singletonList(existing)));
+    }
+
+    @Test
+    public void adjacentExistingBookingsAreNotAddedAsIfTheyWereSimultaneous() {
+        Booking first = booking(start, start.plusHours(1), 6, "confirmed");
+        Booking second = booking(start.plusHours(1), start.plusHours(2), 6, "confirmed");
+        assertNull(BookingValidator.validateAvailability(amenity(), start, start.plusHours(2), 4,
+                Arrays.asList(second, first)));
+        assertEquals(DataError.BOOKING_CONFLICT,
+                BookingValidator.validateAvailability(amenity(), start, start.plusHours(2), 5,
+                        Arrays.asList(first, second)));
+    }
+
+    @Test
+    public void detectsPeakInsideRequestedPeriodAndCountsBookingsAlreadyInProgress() {
+        Booking ongoing = booking(start.minusHours(1), start.plusHours(3), 2, "confirmed");
+        Booking later = booking(start.plusMinutes(30), start.plusHours(1), 5, "pending");
+        assertEquals(DataError.BOOKING_CONFLICT,
+                BookingValidator.validateAvailability(amenity(), start, start.plusHours(2), 4,
+                        Arrays.asList(ongoing, later)));
+        assertNull(BookingValidator.validateAvailability(amenity(), start, start.plusHours(2), 3,
+                Arrays.asList(ongoing, later)));
+    }
+
+    @Test
+    public void bookingsEndingAtStartOrStartingAtEndDoNotConsumeCapacity() {
+        assertNull(BookingValidator.validateAvailability(amenity(), start, start.plusHours(1), 10,
+                Arrays.asList(
+                        booking(start.minusHours(1), start, 10, "confirmed"),
+                        booking(start.plusHours(1), start.plusHours(2), 10, "pending"))));
+    }
+
+    @Test
+    public void ignoresInactiveBookingsAndOtherSpacesButCountsPendingBookings() {
+        Booking otherSpace = booking(start, start.plusHours(1), 10, "confirmed");
+        otherSpace.setAmenityId(2);
+        assertNull(BookingValidator.validateAvailability(amenity(), start, start.plusHours(1), 8,
+                Arrays.asList(otherSpace,
+                        booking(start, start.plusHours(1), 10, "cancelled"),
+                        booking(start, start.plusHours(1), 10, "canceled"),
+                        booking(start, start.plusHours(1), 10, "rejected"),
+                        booking(start, start.plusHours(1), 2, " PENDING "))));
+        assertEquals(DataError.BOOKING_CONFLICT,
+                BookingValidator.validateAvailability(amenity(), start, start.plusHours(1), 9,
+                        Collections.singletonList(booking(start, start.plusHours(1), 2, "pending"))));
+    }
+
+    @Test
+    public void invalidExistingBookingsAreNotMistakenForFreeCapacity() {
+        assertEquals(DataError.INVALID_RESPONSE,
+                BookingValidator.validateAvailability(amenity(), start, start.plusHours(1), 1, null));
+        assertEquals(DataError.INVALID_RESPONSE,
+                BookingValidator.validateAvailability(amenity(), start, start.plusHours(1), 1,
+                        Collections.singletonList(null)));
+        for (int guests : new int[]{0, -1}) {
+            assertEquals(DataError.INVALID_RESPONSE,
+                    BookingValidator.validateAvailability(amenity(), start, start.plusHours(1), 1,
+                            Collections.singletonList(booking(start, start.plusHours(1), guests, "confirmed"))));
+        }
+        Booking invalid = booking(start, start.plusHours(1), 2, "confirmed");
+        for (String invalidStart : new String[]{null, "invalid", start.plusHours(2).toString()}) {
+            invalid.setStartTime(invalidStart);
+            assertEquals(DataError.INVALID_RESPONSE,
+                    BookingValidator.validateAvailability(amenity(), start, start.plusHours(1), 1,
+                            Collections.singletonList(invalid)));
+        }
+    }
+
+    @Test
+    public void unknownCapacityKeepsExclusiveBookingInsteadOfInventingALimit() {
+        Amenity unknown = amenity();
+        unknown.setCapacity(0);
+        assertNull(BookingValidator.validateAvailability(unknown, start, start.plusHours(1), 50,
+                Collections.emptyList()));
+        assertEquals(DataError.BOOKING_CONFLICT,
+                BookingValidator.validateAvailability(unknown, start, start.plusHours(1), 1,
+                        Collections.singletonList(booking(start, start.plusHours(1), 2, "confirmed"))));
+    }
+
+    @Test
+    public void largeOccupancyCannotOverflowAndLookAvailable() {
+        Amenity large = amenity();
+        large.setCapacity(Integer.MAX_VALUE);
+        assertEquals(DataError.BOOKING_CONFLICT,
+                BookingValidator.validateAvailability(large, start, start.plusHours(1), 1,
+                        Arrays.asList(
+                                booking(start, start.plusHours(1), Integer.MAX_VALUE, "confirmed"),
+                                booking(start, start.plusHours(1), Integer.MAX_VALUE, "confirmed"))));
+    }
+
+    @Test
+    public void availabilityRejectsInvalidRequestAndAcceptsAnEmptySchedule() {
+        assertNull(BookingValidator.validateAvailability(amenity(), start, start.plusHours(1), 10,
+                Collections.emptyList()));
+        assertEquals(DataError.INVALID_GUEST_COUNT,
+                BookingValidator.validateAvailability(amenity(), start, start.plusHours(1), 0,
+                        Collections.emptyList()));
+        assertEquals(DataError.INVALID_GUEST_COUNT,
+                BookingValidator.validateAvailability(amenity(), start, start.plusHours(1), 11,
+                        Collections.emptyList()));
+        assertEquals(DataError.INVALID_BOOKING_TIME,
+                BookingValidator.validateAvailability(amenity(), start, start, 1, Collections.emptyList()));
+        assertEquals(DataError.AMENITY_UNAVAILABLE,
+                BookingValidator.validateAvailability(null, start, start.plusHours(1), 1, Collections.emptyList()));
     }
 }

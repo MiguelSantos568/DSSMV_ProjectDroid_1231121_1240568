@@ -66,6 +66,12 @@ um DELETE falhar e impedir uma atualização enquanto se apaga uma reserva.
 Os Mappers convertem horários ou estruturas JSON em modelos da app. O contacto
 da habitação tem uma conversão curta, feita diretamente no seu Repository.
 
+Nas marcações, `BookingValidator.validate()` verifica os dados da nova reserva;
+`validateAvailability()` soma as pessoas das reservas ativas em cada momento do
+período pedido. O Repository consulta também `number_of_people`, filtrando apenas
+os períodos sobrepostos. A preparação da base existente e a limitação de pedidos
+simultâneos estão explicadas no [guia de marcações](Bookings.md).
+
 ## Modelos e armazenamento
 
 `Habitation` reúne IDs e nomes da casa, prédio e condomínio. `HabitationMapper`

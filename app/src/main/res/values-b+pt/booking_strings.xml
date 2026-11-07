@@ -20,7 +20,7 @@
     <string name="booking_invalid_people">Indica pelo menos uma pessoa sem ultrapassar a capacidade do espaço.</string>
     <string name="booking_resident_required">Escolhe um residente ativo da tua habitação.</string>
     <string name="booking_no_residents">Esta habitação não tem residentes ativos na TheCondo. Contacta a administração para registar um residente antes de fazer marcações.</string>
-    <string name="booking_conflict">Este período já está reservado. Escolhe outro horário.</string>
+    <string name="booking_conflict">Não existe capacidade suficiente neste período. Reduz o número de pessoas ou escolhe outro horário.</string>
     <string name="booking_unavailable">Este espaço já não está disponível para marcação.</string>
     <string name="booking_failed">Não foi possível confirmar o resultado. Consulta as tuas marcações antes de submeter novamente.</string>
     <string name="booking_service_unavailable">O serviço de marcações está indisponível. Tenta novamente mais tarde.</string>

@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public final class BookingValidator {
     private BookingValidator() {
@@ -51,12 +53,18 @@ public final class BookingValidator {
         return start.isBefore(otherEnd) && end.isAfter(otherStart);
     }
 
-    public static DataError validateAvailability(long amenityId, LocalDateTime start,
-                                                 LocalDateTime end, List<Booking> bookings) {
+    public static DataError validateAvailability(Amenity amenity, LocalDateTime start,
+                                                 LocalDateTime end, int people, List<Booking> bookings) {
+        if (amenity == null || !amenity.isActive()) return DataError.AMENITY_UNAVAILABLE;
+        if (start == null || end == null || !end.isAfter(start)) return DataError.INVALID_BOOKING_TIME;
+        int capacity = amenity.getCapacity();
+        if (people < 1 || (capacity > 0 && people > capacity)) return DataError.INVALID_GUEST_COUNT;
         if (bookings == null) return DataError.INVALID_RESPONSE;
+        // TreeMap ordena os instantes: entradas somam pessoas e saídas subtraem.
+        Map<LocalDateTime, Long> changes = new TreeMap<>();
         for (Booking booking : bookings) {
             if (booking == null) return DataError.INVALID_RESPONSE;
-            if (booking.getAmenityId() != amenityId || isInactive(booking.getStatus())) continue;
+            if (booking.getAmenityId() != amenity.getId() || isInactive(booking.getStatus())) continue;
             if (booking.getStartTime() == null || booking.getEndTime() == null) {
                 return DataError.INVALID_RESPONSE;
             }
@@ -64,10 +72,23 @@ public final class BookingValidator {
                 LocalDateTime otherStart = LocalDateTime.parse(booking.getStartTime());
                 LocalDateTime otherEnd = LocalDateTime.parse(booking.getEndTime());
                 if (!otherEnd.isAfter(otherStart)) return DataError.INVALID_RESPONSE;
-                if (overlaps(start, end, otherStart, otherEnd)) return DataError.BOOKING_CONFLICT;
+                if (!overlaps(start, end, otherStart, otherEnd)) continue;
+                int guests = booking.getNumberOfGuests();
+                if (guests < 1) return DataError.INVALID_RESPONSE;
+                // Sem capacidade conhecida, mantém-se a reserva exclusiva do espaço.
+                if (capacity <= 0) return DataError.BOOKING_CONFLICT;
+                LocalDateTime arrival = otherStart.isBefore(start) ? start : otherStart;
+                LocalDateTime departure = otherEnd.isAfter(end) ? end : otherEnd;
+                changes.merge(arrival, (long) guests, Long::sum);
+                changes.merge(departure, -(long) guests, Long::sum);
             } catch (DateTimeParseException error) {
                 return DataError.INVALID_RESPONSE;
             }
+        }
+        long occupied = people;
+        for (long change : changes.values()) {
+            occupied += change;
+            if (occupied > capacity) return DataError.BOOKING_CONFLICT;
         }
         return null;
     }

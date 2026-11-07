@@ -125,14 +125,19 @@ public class BookingRepository {
     private void checkAvailability(long unitId, Amenity amenity, long residentId, LocalDateTime start,
                                    LocalDateTime end, int people, String notes, int operation,
                                    RepositoryCallback<Booking> callback) {
-        execute(bookingApi.getForAmenity("eq." + amenity.getId()), operation, new RepositoryCallback<List<BookingDTO>>() {
+        execute(bookingApi.getForAmenity("eq." + amenity.getId(), "lt." + end, "gt." + start),
+                operation, new RepositoryCallback<List<BookingDTO>>() {
             @Override
             public void onSuccess(List<BookingDTO> bookings) {
                 List<Booking> existingBookings = new ArrayList<>();
                 for (BookingDTO dto : bookings) {
-                    if (dto != null) existingBookings.add(BookingMapper.toDomain(dto));
+                    if (dto == null) {
+                        callback.onError(DataError.INVALID_RESPONSE);
+                        return;
+                    }
+                    existingBookings.add(BookingMapper.toDomain(dto));
                 }
-                DataError error = BookingValidator.validateAvailability(amenity.getId(), start, end, existingBookings);
+                DataError error = BookingValidator.validateAvailability(amenity, start, end, people, existingBookings);
                 if (error != null) {
                     callback.onError(error);
                     return;
