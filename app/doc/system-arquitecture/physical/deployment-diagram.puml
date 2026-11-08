@@ -1,0 +1,8 @@
+@startuml
+title Arquitetura física - CondoSched
+
+node "Dispositivo Android" {
+    component "CondoSched"
+}
+
+@enduml

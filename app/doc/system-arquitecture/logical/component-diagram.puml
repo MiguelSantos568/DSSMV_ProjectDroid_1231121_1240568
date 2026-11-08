@@ -1,0 +1,21 @@
+@startuml
+title Component diagram - CondoSched
+
+left to right direction
+skinparam componentStyle uml2
+skinparam linetype ortho
+skinparam shadowing false
+
+component "CondoSched" as App {
+    component "View\n(ui)" as View
+    component "ViewModel\n(viewmodel)" as ViewModel
+    component "Model and data\n(domain, repository, network, dto, session)" as Model
+}
+
+component "Remote services\n(TheCondo, Supabase, WeatherAPI)" <<external>> as Services
+
+View ..> ViewModel
+ViewModel ..> Model
+Model ..> Services
+
+@enduml

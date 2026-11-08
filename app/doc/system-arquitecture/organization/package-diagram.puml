@@ -1,0 +1,23 @@
+@startuml
+title Package diagram - CondoSched
+
+left to right direction
+skinparam packageStyle folder
+skinparam linetype ortho
+skinparam shadowing false
+
+package "CondoSched" {
+    package "user interface" as ui
+    package "viewmodel" as vm
+    package "data\n(repository, network, dto, session)" as data
+    package "domain" as domain
+}
+
+ui .up.> vm
+ui ..> domain
+ui .up.> data
+vm .down.> data
+vm ..> domain
+data ..> domain
+
+@enduml

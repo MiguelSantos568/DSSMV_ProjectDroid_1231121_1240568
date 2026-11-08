@@ -28,12 +28,9 @@ else no session
         AccessVM --> Access : UiState<Result>
         deactivate AccessVM
 
-        alt result.needsRegistration()
-            Access -> Register ++ : startActivity(EXTRA_HOME = result.getHome())
-        else already registered
-            Access -> Main ++ : openHome()\n(NEW_TASK | CLEAR_TASK)
+        Access -> Main ++ : openHome()\n(NEW_TASK | CLEAR_TASK)
         deactivate Access
-        end
+
 
 end
 
