@@ -1,0 +1,50 @@
+@startuml CondoSched_Booking_Class_Diagram
+title Core class diagram - bookings
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam linetype ortho
+hide empty members
+
+package "ui" {
+    class CreateBookingActivity
+    class BookingsActivity
+}
+
+package "viewmodel" {
+    class CreateBookingViewModel
+    class BookingsViewModel
+}
+
+package "repository" {
+    class BookingRepository
+}
+
+package "network" {
+    interface BookingApi
+    interface AmenityApi
+    interface ResidentApi
+}
+
+package "domain" {
+    class Booking
+    class Amenity
+    class Resident
+    class BookingValidator
+}
+
+CreateBookingActivity ..> CreateBookingViewModel
+BookingsActivity ..> BookingsViewModel
+CreateBookingViewModel .right.> BookingRepository
+BookingsViewModel .right.> BookingRepository
+
+BookingRepository .up.> BookingApi
+BookingRepository .up.> AmenityApi
+BookingRepository .up.> ResidentApi
+BookingRepository ..> BookingValidator
+BookingValidator ..> Amenity
+BookingValidator ..> Booking
+Booking ..> Amenity : amenityId
+Booking ..> Resident : residentId
+
+@enduml

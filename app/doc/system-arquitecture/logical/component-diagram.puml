@@ -9,13 +9,20 @@ skinparam shadowing false
 component "CondoSched" as App {
     component "View\n(ui)" as View
     component "ViewModel\n(viewmodel)" as ViewModel
-    component "Model and data\n(domain, repository, network, dto, session)" as Model
+    component "Data access\n(repository, session)" as Data
+    component "Network contracts\n(network, dto)" as Network
+    component "Domain\n(domain)" as Domain
 }
 
-component "Remote services\n(TheCondo, Supabase, WeatherAPI)" <<external>> as Services
+component "Remote services\n(TheCondo;\nSupabase;WeatherAPI)" <<external>> as Services
 
-View ..> ViewModel
-ViewModel ..> Model
-Model ..> Services
+' Provider on the left; requiring component on the right.
+Services -0)- Network : REST endpoints
+Network -0)- Data : API interfaces
+Data -0)- ViewModel : repository operations
+ViewModel -0)- View : Screen actions
+
+ViewModel ..> Domain : state and validation
+Data ..> Domain : mapping and business rules
 
 @enduml
