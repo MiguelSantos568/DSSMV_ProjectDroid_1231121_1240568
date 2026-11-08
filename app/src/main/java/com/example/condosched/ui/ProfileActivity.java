@@ -1,6 +1,8 @@
 package com.example.condosched.ui;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.lifecycle.ViewModelProvider;
@@ -20,7 +22,16 @@ public class ProfileActivity extends SessionActivity {
         ScreenInsets.apply(this);
         BottomNavigation.bind(this, R.id.navProfile);
         onSessionChanged(currentSession());
+
+        // Bind logout button
         findViewById(R.id.logoutButton).setOnClickListener(v -> sessionViewModel.logout());
+
+        // Bind language selection button
+        View languageButton = findViewById(R.id.languageButton);
+        if (languageButton != null) {
+            languageButton.setOnClickListener(this::showLanguageMenu);
+        }
+
         ProfileViewModel viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         viewModel.getState().observe(this, result -> {
             if (result.getStatus() != UiState.Status.ERROR) return;
@@ -44,6 +55,33 @@ public class ProfileActivity extends SessionActivity {
     }
 
     private void text(int id, String value) {
-        ((TextView) findViewById(id)).setText(value);
+        TextView textView = findViewById(id);
+        if (textView != null) {
+            textView.setText(value);
+        }
+    }
+
+    private void showLanguageMenu(View anchor) {
+        PopupMenu menu = new PopupMenu(this, anchor);
+        int current = Language.getCurrentIndex();
+
+        for (int i = 0; i < Language.NAMES.length; i++) {
+            menu.getMenu()
+                    .add(1, i, i, Language.NAMES[i])
+                    .setCheckable(true)
+                    .setChecked(i == current);
+        }
+        menu.getMenu().setGroupCheckable(1, true, true);
+
+        menu.setOnMenuItemClickListener(item -> {
+            int which = item.getItemId();
+            if (which != current) {
+                Language.setLanguage(Language.TAGS[which]);
+                // Refresh activity to apply the changed locale
+                recreate();
+            }
+            return true;
+        });
+        menu.show();
     }
 }

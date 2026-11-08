@@ -8,4 +8,7 @@
   <string name="save">Guardar</string>
   <string name="changeLanguage">Alterar o Idioma</string>
   <string name="language">Idioma</string>
+  <string name="booking_weather_desc">Previsão do tempo para o dia selecionado</string>
+  <string name="lang">pt</string>
+  <string name="weather_unavailable">Previsão do tempo indisponivel para além de 2 dias após hoje</string>
 </resources>

@@ -8,4 +8,7 @@
   <string name="save">Save</string>
   <string name="changeLanguage">Change Language</string>
   <string name="language">Language</string>
+  <string name="booking_weather_desc">Weather forecast for the selected date</string>
+  <string name="lang">en</string>
+  <string name="weather_unavailable">Weather forecast unavailable for more than 2 days past present day</string>
 </resources>
