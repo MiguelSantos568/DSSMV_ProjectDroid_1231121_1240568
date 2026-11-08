@@ -1,0 +1,12 @@
+@startuml
+title SSD - UC03 Create booking
+
+actor Resident as User
+participant ":CondoSched" as System
+
+User -> System : startBooking()
+System --> User : list of amenities
+User -> System : selectSpace(spaceId)
+System --> User : booking confirmed
+
+@enduml

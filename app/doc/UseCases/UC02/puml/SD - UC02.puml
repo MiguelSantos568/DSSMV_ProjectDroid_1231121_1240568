@@ -1,0 +1,31 @@
+@startuml
+title UC02 - View bookings
+
+actor User
+participant BookingsActivity as Activity
+participant BookingsViewModel as VM
+participant BookingRepository as Repo
+participant "BookingApi\n(Supabase)" as BookingApi
+participant "AmenityApi\n(TheCondo)" as AmenityApi
+participant BookingAdapter as Adapter
+participant BookingDisplay as Display
+
+User -> Activity ++ : opens Bookings screen
+    Activity -> VM ++ : load(currentSession().getHome().unitId)
+        VM -> Repo ++ : loadForHome(unitId, callback)
+            Repo -> BookingApi ++ : getForHome("eq." + unitId)\nGET bookings?unit_id=eq.{unitId}
+            BookingApi --> Repo -- : List<BookingDTO> / HTTP error
+                Repo -> AmenityApi ++ : getAll()
+                AmenityApi --> Repo -- : List<AmenityDTO> / error
+            Repo --> VM : onSuccess(bookings)
+            deactivate Repo
+        VM --> Activity : UiState SUCCESS / ERROR
+        deactivate VM
+        Activity -> Adapter ++ : getView(position) [called by ListView]
+            Adapter -> Display ++ : dateTime(start), dateTime(end), status(status)
+            Display --> Adapter -- : formatted texts
+        Adapter --> Activity -- : row view
+    Activity --> User : booking list\n(#id + amenity name, period, status)
+    deactivate Activity
+
+@enduml

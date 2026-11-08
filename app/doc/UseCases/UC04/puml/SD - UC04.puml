@@ -1,0 +1,28 @@
+@startuml
+title UC04 - Cancel booking
+
+actor User
+participant BookingsActivity as Activity
+participant BookingDisplay as Display
+participant BookingsViewModel as VM
+participant BookingRepository as Repo
+participant "BookingApi\n(Supabase)" as BookingApi
+
+User -> Activity ++ : taps delete button on a booking row
+    Activity -> Display ++ : dateTime(startTime), dateTime(endTime)
+    Display --> Activity -- : formatted period
+Activity --> User : confirmation dialog\n(booking_delete_title / message with name and period)
+User -> Activity : booking_delete
+    Activity -> VM ++ : deleteBooking(currentSession().getHome().unitId, booking.getId())
+    VM -> VM : find booking in current list\n(same id and unitId)
+    VM -> Repo ++ : deleteBooking(unitId, bookingId, callback)
+        Repo -> BookingApi ++ : deleteBooking("eq."+bookingId, "eq."+unitId)\nDELETE bookings?select=id,unit_id\n(Prefer: return=representation)
+        BookingApi --> Repo -- : List<BookingDTO>
+    Repo --> VM : onSuccess(bookingId)
+    deactivate Repo
+    VM --> Activity : deletion SUCCESS(bookingId)
+    deactivate VM
+Activity --> User : toast booking_deleted
+deactivate Activity
+
+@enduml

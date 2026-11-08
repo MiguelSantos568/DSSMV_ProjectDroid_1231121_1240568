@@ -1,0 +1,11 @@
+@startuml
+title SSD - UC02 View bookings
+
+actor Resident as User
+participant ":CondoSched" as System
+
+User -> System : viewBookings()
+System --> User : list of bookings (amenity, time)
+
+
+@enduml

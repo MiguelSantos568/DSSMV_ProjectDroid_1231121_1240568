@@ -31,7 +31,7 @@ import static android.provider.Settings.System.getString;
 
 public final class WeatherService {
 
-    private static final String API_Key = "663a7db0500f4a4885f00754260111";
+    private static final String API_Key = "04eba5420fe84d0e91e25229260811";
 
     // Default position (Porto)
     public static final String DEFAULT_LAT = "41.15";

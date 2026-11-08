@@ -1,0 +1,10 @@
+@startuml
+title SSD - UC01 Login
+
+actor Resident as User
+participant ":CondoSched" as System
+
+User -> System : scan QR Code
+    System --> User : session started, bookings home screen
+
+@enduml

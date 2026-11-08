@@ -1,0 +1,40 @@
+@startuml
+title UC01 - Login
+
+actor User
+participant AccessActivity as Access
+participant "QR scan" as Scanner
+participant SessionViewModel as Session
+participant AccessViewModel as AccessVM
+participant RegisterActivity as Register
+participant MainActivity as Main
+
+User -> Access ++ : opens app (onCreate)
+activate Access
+    Access -> Session ++: current()
+    Session --> Access : session / null
+    deactivate Session
+
+alt session exists
+    Access -> Main ++ : openHome()\n(NEW_TASK | CLEAR_TASK)
+    deactivate Access
+else no session
+    User -> Access : tap "Scan QR"
+        Access -> Scanner ++ : launch(ScanOptions: QR_CODE)
+        Scanner --> Access : result.getContents()
+        deactivate Scanner
+
+        Access -> AccessVM ++ : scan(contents)
+        AccessVM --> Access : UiState<Result>
+        deactivate AccessVM
+
+        alt result.needsRegistration()
+            Access -> Register ++ : startActivity(EXTRA_HOME = result.getHome())
+        else already registered
+            Access -> Main ++ : openHome()\n(NEW_TASK | CLEAR_TASK)
+        deactivate Access
+        end
+
+end
+
+@enduml

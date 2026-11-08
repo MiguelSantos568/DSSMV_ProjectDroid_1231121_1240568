@@ -1,0 +1,31 @@
+@startuml
+skinparam packageStyle rectangle
+
+actor Resident as user
+rectangle "WeatherAPI" <<external API>> as API
+rectangle "supabase" <<external API>> as SupaAPI
+
+rectangle "CondoSched" {
+    usecase "UC01 - Login" as UC01
+    usecase "UC02 - View bookings" as UC02
+    usecase "UC03 - Create booking" as UC03
+    usecase "UC04 - Cancel booking" as UC04
+}
+
+user -up-> UC01
+user -up-> UC02
+user -up-> UC03
+user -up-> UC04
+
+UC02 .up.> UC01 : <<include>>
+UC03 .up.> UC01 : <<include>>
+UC04 .up.> UC01 : <<include>>
+
+UC03  -down-> API
+
+UC01 -left--> SupaAPI
+UC02 -left--> SupaAPI
+UC03 -left--> SupaAPI
+UC04 -left--> SupaAPI
+
+@enduml

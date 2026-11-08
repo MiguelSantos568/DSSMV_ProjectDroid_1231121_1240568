@@ -1,0 +1,55 @@
+@startuml
+title UC03 - Create booking
+
+actor User
+participant "CreateBooking\nActivity" as Form
+participant "CreateBooking\nViewModel" as VM
+participant BookingValidator as Validator
+participant BookingRepository as Repo
+participant "AmenityApi\n(TheCondo)" as AmenityApi
+participant "ResidentApi\n(TheCondo)" as ResidentApi
+participant "BookingApi\n(Supabase)" as BookingApi
+participant WeatherService as Weather
+
+User -> Form ++ : chooses an amenity\n(Intent with EXTRA_AMENITY)
+    Form -> VM ++ : load(unitId, amenity)
+    VM --> Form : date, start and end values
+        VM -> Repo ++ : loadResidents(unitId, callback)
+            Repo -> ResidentApi ++ : getActiveResidents()
+            ResidentApi --> Repo -- : List<ResidentDTO>
+        Repo --> VM -- : onSuccess(List<Resident>)
+    VM --> Form : residents LOADING
+    deactivate VM
+
+    Form -> Weather ++ : getWeather(lat, lon) [background thread]
+    Weather --> Form -- : entries "yyyy-MM-dd;code;description"
+
+User -> Form : picks date / start / end
+    Form -> VM ++ : setDate / setStart / setEnd
+    VM --> Form -- : LiveData value
+User -> Form : selects resident, types people and notes
+User -> Form : taps "Book"
+    Form -> VM ++ : submit(selectedResidentId, peopleText, notesText)
+        VM -> Validator ++ : validate(amenity from Intent, start, end,\npeople)
+        Validator --> VM -- : DataError or null
+        VM -> Repo ++ : create(unitId, amenityId, residentId,\nstart, end, people, notes, callback)
+            Repo -> AmenityApi ++ : getById(amenityId)
+            AmenityApi --> Repo -- : AmenityDTO
+        Repo -> Validator ++ : validate(amenity, start, end, people,\nnow Europe/Lisbon)\nsame rules, now with the amenity from the server
+        Validator --> Repo -- : DataError or null
+            Repo -> ResidentApi ++ : getActiveResidents()
+            ResidentApi --> Repo -- : List<ResidentDTO>
+            Repo -> BookingApi ++ : getForAmenity("eq."+amenityId, "lt."+end, "gt."+start)\nGET bookings: status in (confirmed, pending),\noverlapping the requested period
+            BookingApi --> Repo -- : List<BookingDTO>\n(amenity_id, start_time, end_time,\nstatus, number_of_people)
+        Repo -> Validator ++ : validateAvailability(amenity, start, end,\npeople, existingBookings)
+        Validator --> Repo -- : DataError or null
+            Repo -> BookingApi ++ : create(request)\nPOST bookings (Prefer: return=representation)
+            BookingApi --> Repo -- : List<BookingDTO>
+        Repo --> VM : onSuccess(Booking)
+        deactivate Repo
+    VM --> Form : result SUCCESS(Booking) / ERROR(DataError)
+    deactivate VM
+Form --> User : status = booking_success(id, status)\nsubmit button hidden, fields locked,\nback and "view list" enabled
+deactivate Form
+
+@enduml
