@@ -2,13 +2,14 @@
 
 Aplicação Android em Java para DSSMV 2026/27, compatível com API 26+.
 O acesso é feito por QR de uma habitação. A app consulta comodidades e permite
-criar, consultar e apagar marcações.
+criar, consultar e apagar marcações, com previsão meteorológica para a data escolhida.
 
 ## Guias para estudar
 
 1. [Organização e relação com as teóricas](app/doc/Architecture-guide.md)
 2. [QR, registo e sessão](app/doc/QR-access.md)
 3. [Comodidades e marcações](app/doc/Bookings.md)
+4. [Meteorologia](app/doc/Weather.md)
 
 [Diagrama do domínio](app/doc/DomainModel.puml) ·
 [Proposta inicial](app/doc/CondoSched.md) · [Equipa](app/doc/TeamComposition.md)

@@ -2,6 +2,11 @@
 hide empty methods
 
 package "Modelos dos ecrãs" {
+    class Forecast {
+        date: LocalDate
+        conditionCode: int
+        description: String
+    }
     class Habitation {
         unitId: long
         condominiumId: long

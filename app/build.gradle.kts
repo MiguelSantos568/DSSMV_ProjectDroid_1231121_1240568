@@ -1,6 +1,15 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
 }
+
+val localConfig = Properties().apply {
+    val configFile = rootProject.file("local.properties")
+    if (configFile.exists()) configFile.inputStream().use { load(it) }
+}
+val weatherApiKey = localConfig.getProperty("weather.api.key", "")
+    .replace("\\", "\\\\").replace("\"", "\\\"")
 
 android {
     namespace = "com.example.condosched"
@@ -16,7 +25,11 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+        buildConfigField("String", "WEATHER_API_KEY", "\"$weatherApiKey\"")
 
+    }
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {

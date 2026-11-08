@@ -11,6 +11,7 @@
   <string name="language">Language</string>
   <string name="booking_weather_desc">Weather forecast for the selected date</string>
   <string name="lang">en</string>
-  <string name="weather_unavailable">Weather forecast unavailable for more than 2 days past present day</string>
-  <string name="weather_info">Weather forecast limited to 3 days, including today</string>
+  <string name="weather_unavailable">Weather forecast unavailable for this date.</string>
+  <string name="weather_info">Forecast for your location. Porto is used when location is unavailable. The forecast range depends on the service plan.</string>
+  <string name="weather_loading">Loading weather forecast…</string>
 </resources>

@@ -11,6 +11,7 @@
   <string name="language">Idioma</string>
   <string name="booking_weather_desc">Previsão do tempo para o dia selecionado</string>
   <string name="lang">pt</string>
-  <string name="weather_unavailable">Previsão do tempo indisponivel para além de 2 dias após hoje</string>
-  <string name="weather_info">Previsão metereologica limitada a 3 dias, incluindo hoje</string>
+  <string name="weather_unavailable">Previsão meteorológica indisponível para esta data.</string>
+  <string name="weather_info">Previsão para a tua localização. Sem localização, é usado o Porto. O período disponível depende do plano do serviço.</string>
+  <string name="weather_loading">A carregar previsão meteorológica…</string>
 </resources>

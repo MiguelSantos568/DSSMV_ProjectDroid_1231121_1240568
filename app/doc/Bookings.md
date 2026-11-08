@@ -45,6 +45,21 @@ O POST envia o próprio DTO, sem função RPC. O Supabase guarda a linha e gera 
 O ViewModel impede submissões repetidas. Datas/horas ficam no ViewModel e no estado
 guardado da Activity; os campos do formulário são restaurados pelo Android.
 
+## Previsão meteorológica no formulário
+
+A Activity pede permissão de localização e usa `WeatherLocation` para obter
+coordenadas. `WeatherViewModel` pede a previsão ao `WeatherRepository`, que chama
+`WeatherApi` por Retrofit e converte o JSON em `List<Forecast>`. Sem coordenadas,
+usa Porto. A Activity observa LiveData e mostra a descrição e o ícone do dia
+selecionado, através de `WeatherDisplay`. Alterar a data reutiliza a previsão
+carregada, sem repetir o pedido HTTP.
+
+O número de dias disponíveis depende do plano da WeatherAPI. Uma data fora da
+resposta ou uma falha mostra previsão indisponível, mas não bloqueia a marcação.
+O ecrã meteorológico do menu usa o mesmo ViewModel e Repository, com
+`ForecastAdapter` para apresentar as linhas. A chave local e o percurso dos dados
+estão explicados no [guia de meteorologia](Weather.md).
+
 ## Regras das marcações
 
 - A comodidade deve estar ativa; início no futuro e fim posterior ao início.

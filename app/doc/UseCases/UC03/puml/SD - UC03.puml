@@ -9,7 +9,9 @@ participant BookingRepository as Repo
 participant "AmenityApi\n(TheCondo)" as AmenityApi
 participant "ResidentApi\n(TheCondo)" as ResidentApi
 participant "BookingApi\n(Supabase)" as BookingApi
-participant WeatherService as Weather
+participant WeatherViewModel as WeatherVM
+participant WeatherRepository as WeatherRepo
+participant "WeatherApi\n(WeatherAPI)" as Weather
 
 User -> Form ++ : chooses an amenity\n(Intent with EXTRA_AMENITY)
     Form -> VM ++ : load(unitId, amenity)
@@ -21,8 +23,13 @@ User -> Form ++ : chooses an amenity\n(Intent with EXTRA_AMENITY)
     VM --> Form : residents LOADING
     deactivate VM
 
-    Form -> Weather ++ : getWeather(lat, lon) [background thread]
-    Weather --> Form -- : entries "yyyy-MM-dd;code;description"
+    Form -> WeatherVM : load(lat, lon, days, language)
+    WeatherVM -> WeatherRepo : load(..., callback)
+    WeatherRepo -> Weather ++ : getForecast(key, location, days, language)\nRetrofit enqueue()
+    Weather --> WeatherRepo -- : WeatherDTO
+    WeatherRepo -> WeatherRepo : convert DTO to List<Forecast>
+    WeatherRepo --> WeatherVM : onSuccess(List<Forecast>) / onError(DataError)
+    WeatherVM --> Form : LiveData UiState<List<Forecast>>
 
 User -> Form : picks date / start / end
     Form -> VM ++ : setDate / setStart / setEnd

@@ -7,7 +7,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
- * Two independent clients: the Supabase key is never sent to TheCondo.
+ * Clientes independentes para não partilhar chaves entre servidores.
  */
 public final class ApiClient {
     private static final String THE_CONDO_URL = "http://193.136.62.24/thecondo/api/";
@@ -15,12 +15,18 @@ public final class ApiClient {
     // As duas instâncias impedem o envio da chave Supabase para a TheCondo.
     private static final Retrofit THE_CONDO = createTheCondoClient();
     private static final Retrofit SUPABASE = createSupabaseClient();
+    private static final Retrofit WEATHER = new Retrofit.Builder()
+            .baseUrl("https://api.weatherapi.com/v1/")
+            .client(createHttpClient().build())
+            .addConverterFactory(GsonConverterFactory.create())
+            .build();
 
     private static final CondominiumApi CONDOMINIUM = THE_CONDO.create(CondominiumApi.class);
     private static final AmenityApi AMENITIES = THE_CONDO.create(AmenityApi.class);
     private static final BookingApi BOOKINGS = SUPABASE.create(BookingApi.class);
     private static final ResidentApi RESIDENTS = THE_CONDO.create(ResidentApi.class);
     private static final HabitationProfileApi PROFILES = SUPABASE.create(HabitationProfileApi.class);
+    private static final WeatherApi FORECAST = WEATHER.create(WeatherApi.class);
 
     private ApiClient() {
     }
@@ -70,5 +76,9 @@ public final class ApiClient {
 
     public static HabitationProfileApi profiles() {
         return PROFILES;
+    }
+
+    public static WeatherApi weather() {
+        return FORECAST;
     }
 }

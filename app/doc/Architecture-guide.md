@@ -79,18 +79,19 @@ percorre `CondominiumDTO → BuildingDTO → UnitDTO` e constrói esse objeto.
 Os DTOs representam a API; não é preciso duplicar toda essa hierarquia no domínio.
 `Habitation` é imutável e Serializable para passar do QR ao registo num Intent.
 `HabitationProfile` contém o contacto e `HomeSession` junta a casa ao contacto.
-Os restantes modelos principais são `Amenity`, `Resident` e `Booking`.
+Os restantes modelos principais são `Amenity`, `Resident`, `Booking` e `Forecast`.
 
 | Local | Dados |
 | --- | --- |
 | TheCondo | Consulta de condomínios, prédios, habitações, comodidades e residentes |
 | Supabase | Tabelas `habitation_profiles` e `bookings`, por HTTP direto, sem RPC |
+| WeatherAPI | Consulta da previsão por coordenadas, dias e idioma |
 | SharedPreferences | Sessão local, através de SessionRepository → SessionManager |
 | ViewModel | Estado temporário do ecrã, incluindo a fotografia capturada |
 | MediaStore | Fotografias guardadas em `Pictures/CondoSched` |
 
-`ApiClient` separa os dois clientes HTTP; a chave pública Supabase só segue para
-esse serviço. O protótipo usa dados fictícios e acesso sem autenticação individual:
+`ApiClient` separa os clientes TheCondo, Supabase e WeatherAPI; cada chave só segue
+para o respetivo serviço. O protótipo usa dados fictícios e acesso sem autenticação individual:
 os filtros por casa organizam os pedidos, mas não são uma proteção entre utilizadores.
 
 ## Ciclo de vida e fotografia
@@ -104,6 +105,13 @@ A Activity pede permissões e usa `TakePicturePreview` para obter uma miniatura.
 `CameraViewModel` mantém a imagem e `PhotoRepository` grava-a numa thread de trabalho,
 regressando à thread principal com Handler. API 26–28 pede permissão de escrita;
 API 29+ usa MediaStore com `RELATIVE_PATH` e `IS_PENDING`.
+
+## Meteorologia
+
+Segue o percurso Activity → WeatherViewModel → WeatherRepository → WeatherApi.
+A localização e a apresentação ficam em `ui`; os pedidos e a conversão ficam no
+Repository. O funcionamento, os ficheiros e a configuração estão no
+[guia de meteorologia](Weather.md).
 
 ## Guias e verificação
 
