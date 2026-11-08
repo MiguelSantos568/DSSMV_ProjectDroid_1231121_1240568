@@ -1,4 +1,4 @@
-@startuml CondoSched_Booking_Class_Diagram
+@startuml
 title Core class diagram - bookings
 
 left to right direction
