@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="app_name">CondoSched</string>
+  <string name="amenity">Valência</string>
   <string name="camera">Câmara</string>
   <string name="condominium">Condomínio</string>
   <string name="credits">Créditos</string>
@@ -11,4 +12,5 @@
   <string name="booking_weather_desc">Previsão do tempo para o dia selecionado</string>
   <string name="lang">pt</string>
   <string name="weather_unavailable">Previsão do tempo indisponivel para além de 2 dias após hoje</string>
+  <string name="weather_info">Previsão metereologica limitada a 3 dias, incluindo hoje</string>
 </resources>

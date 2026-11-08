@@ -29,6 +29,10 @@ public class MainActivity extends SessionActivity {
                 open(CameraActivity.class);
                 return true;
             });
+            menu.getMenu().add(R.string.view_weather).setOnMenuItemClickListener(item -> {
+                open(WeatherActivity.class);
+                return true;
+            });
             menu.show();
         });
         BottomNavigation.bind(this, R.id.navHome);

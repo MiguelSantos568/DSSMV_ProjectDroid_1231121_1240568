@@ -20,4 +20,5 @@
   <string name="email_invalid">Enter a valid email</string>
   <string name="logout">Sign out / change home</string>
   <string name="take_photo">Take a photo</string>
+  <string name="view_weather">View weather forecast</string>
 </resources>

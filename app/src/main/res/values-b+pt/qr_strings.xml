@@ -20,4 +20,5 @@
   <string name="email_invalid">Introduz um email válido</string>
   <string name="logout">Sair / mudar de habitação</string>
   <string name="take_photo">Tirar fotografia</string>
+  <string name="view_weather">Ver previsão meteorologia</string>
 </resources>
